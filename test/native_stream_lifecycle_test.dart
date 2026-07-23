@@ -8,6 +8,11 @@ Stream<int> _observedSource(List<String> events) async* {
   events.add('source:after-yield');
 }
 
+Stream<int> _observedErrorSource(Object error) async* {
+  yield 1;
+  throw error;
+}
+
 void main() {
   test('an async generator does not start before it is listened to', () async {
     final sourceEvents = <String>[];
@@ -17,10 +22,7 @@ void main() {
 
     await stream.drain<void>();
 
-    expect(sourceEvents, [
-      'source:start',
-      'source:after-yield',
-    ]);
+    expect(sourceEvents, ['source:start', 'source:after-yield']);
   });
 
   test('listener callbacks run only after listen returns', () async {
@@ -48,9 +50,34 @@ void main() {
     await done.future;
 
     expect(callbackStates, everyElement(isTrue));
-    expect(listenerEvents, [
-      'listener:data:1',
-      'listener:done',
-    ]);
+    expect(listenerEvents, ['listener:data:1', 'listener:done']);
+  });
+
+  test('listener receives data, error, and done in order', () async {
+    final expectedError = StateError('boom');
+    final listenerEvents = <String>[];
+    final done = Completer<void>();
+    Object? observedError;
+    StackTrace? observedStackTrace;
+
+    _observedErrorSource(expectedError).listen(
+      (value) => listenerEvents.add('listener:data:$value'),
+      onError: (Object error, StackTrace stackTrace) {
+        observedError = error;
+        observedStackTrace = stackTrace;
+        listenerEvents.add('listener:error');
+      },
+      onDone: () {
+        listenerEvents.add('listener:done');
+        done.complete();
+      },
+      cancelOnError: false,
+    );
+
+    await done.future;
+
+    expect(listenerEvents, ['listener:data:1', 'listener:error', 'listener:done']);
+    expect(observedError, same(expectedError));
+    expect(observedStackTrace, isNotNull);
   });
 }

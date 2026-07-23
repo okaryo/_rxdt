@@ -105,8 +105,9 @@ The detailed learning-project operating pattern is documented in
 ## Current State
 
 The repository contains the initial learning plan, a minimal Dart library
-package, and a first test showing when an `async*` stream starts producing
-events. The first stream operator has not been implemented yet.
+package, and tests showing when an `async*` stream starts and how data, error,
+and done events reach a listener. The first stream operator has not been
+implemented yet.
 
 ## Project Documents
 

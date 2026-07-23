@@ -64,7 +64,7 @@ First implementation milestone:
 - [x] Create a small stream using `Stream.fromIterable`, `async*`, or a
   `StreamController`.
 - [x] Observe when stream production starts.
-- [ ] Record data, error, and done callbacks in order.
+- [x] Record data, error, and done callbacks in order.
 - [ ] Compare an error event with an exception thrown outside the stream.
 - [ ] Observe the `Future` returned by `Stream#toList` or
   `StreamSubscription#asFuture`.
@@ -264,3 +264,6 @@ changes.
   under `lib/src/operators/`, with behavior tested through the public import.
 - Added an `async*` lifecycle experiment showing that creating the stream does
   not run the generator body and that production begins only after `listen`.
+- Recorded data, error, and done callbacks from an `async*` source. An uncaught
+  exception in the generator becomes an error event with a stack trace, then
+  the terminated generator closes the stream.

@@ -45,5 +45,35 @@ the language-level contract only says that listening starts the body.
 Likewise, the tests do not impose a total ordering between source-side effects
 and listener callbacks.
 
-This experiment does not yet cover error events, cancellation, pause and resume,
-or multiple listeners.
+## Data, Error, And Done
+
+An uncaught exception inside an `async*` function is emitted as an error event
+on its stream:
+
+```dart
+Stream<int> observedErrorSource(Object error) async* {
+  yield 1;
+  throw error;
+}
+```
+
+With `cancelOnError: false`, the listener observes:
+
+```text
+listener:data:1
+listener:error
+listener:done
+```
+
+The thrown object reaches `onError` together with a stack trace. It does not
+escape synchronously from the call to `listen`. In this example, the uncaught
+exception terminates the generator body, so the error event is followed by the
+done event.
+
+An error event does not universally mean that every stream must close. A stream
+source can emit an error and later emit more events. The generator closes here
+because its own body terminates after the uncaught exception.
+
+This experiment does not yet compare an error event with an exception thrown
+outside a stream. It also does not cover cancellation, pause and resume, or
+multiple listeners.
