@@ -104,8 +104,8 @@ The detailed learning-project operating pattern is documented in
 
 ## Current State
 
-The repository currently contains the initial learning plan only. The Dart
-package and first stream operator have not been implemented yet.
+The repository contains the initial learning plan and a minimal Dart library
+package. The first stream operator has not been implemented yet.
 
 ## Project Documents
 

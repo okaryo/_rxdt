@@ -44,7 +44,7 @@ Roadmap sections are learning themes, not single work units.
 - [x] Create initial project documentation.
 - [x] Copy the reusable learning-project pattern.
 - [x] Decide the first implementation milestone.
-- [ ] Initialize the Dart package structure.
+- [x] Initialize the Dart package structure.
 - [ ] Decide the initial public API and internal file layout.
 - [x] Decide how to organize learning notes and executable examples.
 
@@ -256,3 +256,6 @@ changes.
   multiple sources, timing, multicasting, or subjects.
 - Use Dart's standard `dart:async` abstractions as the implementation foundation
   and add RxDart only when a focused behavior comparison is useful.
+- Initialized a minimal Dart library package with `lib/rxdt.dart` as its empty
+  public entry point. No operator implementation was added during package
+  setup.
