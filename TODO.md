@@ -61,9 +61,9 @@ First implementation milestone:
 
 ### 1. Native Stream Lifecycle
 
-- [ ] Create a small stream using `Stream.fromIterable`, `async*`, or a
+- [x] Create a small stream using `Stream.fromIterable`, `async*`, or a
   `StreamController`.
-- [ ] Observe when stream production starts.
+- [x] Observe when stream production starts.
 - [ ] Record data, error, and done callbacks in order.
 - [ ] Compare an error event with an exception thrown outside the stream.
 - [ ] Observe the `Future` returned by `Stream#toList` or
@@ -262,3 +262,5 @@ changes.
 - Chose `package:rxdt/rxdt.dart` as the single public import and a
   `Stream<T>` extension as the first API. Operator implementations will live
   under `lib/src/operators/`, with behavior tested through the public import.
+- Added an `async*` lifecycle experiment showing that creating the stream does
+  not run the generator body and that production begins only after `listen`.

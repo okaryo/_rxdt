@@ -104,8 +104,9 @@ The detailed learning-project operating pattern is documented in
 
 ## Current State
 
-The repository contains the initial learning plan and a minimal Dart library
-package. The first stream operator has not been implemented yet.
+The repository contains the initial learning plan, a minimal Dart library
+package, and a first test showing when an `async*` stream starts producing
+events. The first stream operator has not been implemented yet.
 
 ## Project Documents
 
@@ -114,3 +115,5 @@ package. The first stream operator has not been implemented yet.
 - `LEARNING_PROJECT.md`: reusable AI-assisted learning project pattern.
 - `TODO.md`: living learning roadmap and progress tracker.
 - `docs/project-layout.md`: initial public API and internal layout decisions.
+- `docs/native-stream-lifecycle.md`: first observation of stream creation,
+  listening, data delivery, and completion.
