@@ -45,7 +45,7 @@ Roadmap sections are learning themes, not single work units.
 - [x] Copy the reusable learning-project pattern.
 - [x] Decide the first implementation milestone.
 - [x] Initialize the Dart package structure.
-- [ ] Decide the initial public API and internal file layout.
+- [x] Decide the initial public API and internal file layout.
 - [x] Decide how to organize learning notes and executable examples.
 
 First implementation milestone:
@@ -259,3 +259,6 @@ changes.
 - Initialized a minimal Dart library package with `lib/rxdt.dart` as its empty
   public entry point. No operator implementation was added during package
   setup.
+- Chose `package:rxdt/rxdt.dart` as the single public import and a
+  `Stream<T>` extension as the first API. Operator implementations will live
+  under `lib/src/operators/`, with behavior tested through the public import.

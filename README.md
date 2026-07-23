@@ -113,3 +113,4 @@ package. The first stream operator has not been implemented yet.
 - `AGENTS.md`: working instructions for AI agents and future contributors.
 - `LEARNING_PROJECT.md`: reusable AI-assisted learning project pattern.
 - `TODO.md`: living learning roadmap and progress tracker.
+- `docs/project-layout.md`: initial public API and internal layout decisions.
