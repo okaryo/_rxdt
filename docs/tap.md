@@ -42,6 +42,29 @@ first implementation focused on the data path. That helper supplies the
 subscription plumbing and the default forwarding behavior for handler types
 that are not provided.
 
-The current test deliberately covers only data observation and unchanged data
-forwarding. Error forwarding, done forwarding, laziness, and callback failures
-need separate tests before those behaviors are considered understood.
+## Error And Done Forwarding
+
+The transformer defines only `handleData`. Because it does not define
+`handleError` or `handleDone`, `StreamTransformer.fromHandlers` forwards those
+events without changing them.
+
+The lifecycle test sends this source sequence:
+
+```text
+data: 1
+error
+data: 2
+done
+```
+
+The downstream listener receives the same sequence. The error object and stack
+trace retain their identities, and done is delivered exactly once. The tap
+callback sees only the two data values because the current public API accepts
+only an `onData` callback.
+
+This also demonstrates that an error event is not necessarily terminal. The
+source remains open after its error and can add another data event before
+closing.
+
+Laziness and callback failures still need separate tests before those behaviors
+are considered understood.
