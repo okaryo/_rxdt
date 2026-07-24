@@ -66,9 +66,9 @@ First implementation milestone:
 - [x] Observe when stream production starts.
 - [x] Record data, error, and done callbacks in order.
 - [x] Compare an error event with an exception thrown outside the stream.
-- [ ] Observe the `Future` returned by `Stream#toList` or
+- [x] Observe the `Future` returned by `Stream#toList` or
   `StreamSubscription#asFuture`.
-- [ ] Document the first source-to-listener lifecycle.
+- [x] Document the first source-to-listener lifecycle.
 
 Questions to answer:
 
@@ -270,3 +270,6 @@ changes.
 - Compared error delivery paths: a synchronous exception is caught around its
   function call, while an error event from an `async*` source is delivered to
   the subscription's `onError` callback rather than thrown from `listen`.
+- Observed `Stream#toList`: it starts a subscription immediately, completes
+  with all collected values only after done, and completes with an error rather
+  than a partial list when the stream fails.

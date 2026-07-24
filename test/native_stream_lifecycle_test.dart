@@ -13,6 +13,16 @@ Stream<int> _observedErrorSource(Object error) async* {
   throw error;
 }
 
+Stream<int> _gatedSource(
+  Completer<void> reachedGate,
+  Future<void> releaseGate,
+) async* {
+  yield 1;
+  reachedGate.complete();
+  await releaseGate;
+  yield 2;
+}
+
 Never _throwSynchronously(Object error) => throw error;
 
 void main() {
@@ -120,5 +130,33 @@ void main() {
     await done.future;
 
     expect(observedError, same(expectedError));
+  });
+
+  test('toList listens immediately and completes after done', () async {
+    final reachedGate = Completer<void>();
+    final releaseGate = Completer<void>();
+    List<int>? completedValues;
+
+    final valuesFuture = _gatedSource(reachedGate, releaseGate.future).toList();
+    valuesFuture.then((values) {
+      completedValues = values;
+    });
+
+    await reachedGate.future;
+
+    expect(completedValues, isNull);
+
+    releaseGate.complete();
+
+    expect(await valuesFuture, [1, 2]);
+  });
+
+  test('toList completes with an error instead of a partial list', () async {
+    final expectedError = StateError('collection failed');
+
+    await expectLater(
+      _observedErrorSource(expectedError).toList(),
+      throwsA(same(expectedError)),
+    );
   });
 }

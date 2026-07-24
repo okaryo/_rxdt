@@ -106,8 +106,9 @@ The detailed learning-project operating pattern is documented in
 
 The repository contains the initial learning plan, a minimal Dart library
 package, and tests showing when an `async*` stream starts and how data, error,
-and done events reach a listener. The first stream operator has not been
-implemented yet.
+and done events reach a listener. It also demonstrates how `Stream#toList`
+represents stream completion as a `Future`. The first stream operator has not
+been implemented yet.
 
 ## Project Documents
 

@@ -110,5 +110,48 @@ current function call by throwing. A stream error is an event delivered to an
 active subscription. For the `async*` source in this experiment, the exception
 thrown by the generator body is converted into that error event.
 
-This experiment does not yet cover exceptions thrown by listener callbacks,
-cancellation, pause and resume, or multiple listeners.
+## Converting Completion To A Future
+
+`Stream#toList` subscribes to the stream, collects its data events, and returns a
+`Future<List<T>>`.
+
+The lifecycle test uses a source that pauses at an explicit gate after its first
+value:
+
+```dart
+Stream<int> gatedSource(
+  Completer<void> reachedGate,
+  Future<void> releaseGate,
+) async* {
+  yield 1;
+  reachedGate.complete();
+  await releaseGate;
+  yield 2;
+}
+```
+
+Calling `toList` is enough to start listening. When the source reaches the gate,
+the returned future is still incomplete because the stream has not sent done.
+After the gate is released, the source yields its second value and closes, so
+the future completes with `[1, 2]`.
+
+```text
+toList()
+  -> subscription starts
+  -> data: 1
+  -> wait at gate
+  -> data: 2
+  -> done
+  -> Future completes with [1, 2]
+```
+
+If the stream emits an error before done, the future completes with that error
+instead of exposing a partial list. `toList` therefore converts the stream's
+terminal outcome into one future outcome:
+
+- done becomes a successful `List<T>`.
+- error becomes a failed `Future<List<T>>`.
+
+This experiment does not yet cover `StreamSubscription#asFuture`, exceptions
+thrown by listener callbacks, cancellation, pause and resume, or multiple
+listeners.
