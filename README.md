@@ -107,8 +107,8 @@ The detailed learning-project operating pattern is documented in
 The repository contains the initial learning plan, a minimal Dart library
 package, and tests showing when an `async*` stream starts and how data, error,
 and done events reach a listener. It also demonstrates how `Stream#toList`
-represents stream completion as a `Future`. The first stream operator has not
-been implemented yet.
+represents stream completion as a `Future`. A first `tap` operator observes data
+events without changing the values sent downstream.
 
 ## Project Documents
 
@@ -119,3 +119,4 @@ been implemented yet.
 - `docs/project-layout.md`: initial public API and internal layout decisions.
 - `docs/native-stream-lifecycle.md`: first observation of stream creation,
   listening, data delivery, and completion.
+- `docs/tap.md`: public API and data path of the first stream operator.

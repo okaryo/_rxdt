@@ -79,10 +79,10 @@ Questions to answer:
 
 ### 2. First Transformer And Operator
 
-- [ ] Add an extension method on `Stream<T>`.
-- [ ] Implement a minimal `tap`-style operator.
-- [ ] Express the operator through an explicit `StreamTransformer`.
-- [ ] Forward data events without changing their values.
+- [x] Add an extension method on `Stream<T>`.
+- [x] Implement a minimal `tap`-style operator.
+- [x] Express the operator through an explicit `StreamTransformer`.
+- [x] Forward data events without changing their values.
 - [ ] Forward error events with their stack traces.
 - [ ] Forward the done event exactly once.
 - [ ] Verify that creating the transformed stream does not eagerly listen.
@@ -273,3 +273,5 @@ changes.
 - Observed `Stream#toList`: it starts a subscription immediately, completes
   with all collected values only after done, and completes with an error rather
   than a partial list when the stream fails.
+- Added the first `tap` extension and a private transformer. Its data handler
+  observes each event, then adds the same value to the downstream sink.
