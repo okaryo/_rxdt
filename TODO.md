@@ -65,7 +65,7 @@ First implementation milestone:
   `StreamController`.
 - [x] Observe when stream production starts.
 - [x] Record data, error, and done callbacks in order.
-- [ ] Compare an error event with an exception thrown outside the stream.
+- [x] Compare an error event with an exception thrown outside the stream.
 - [ ] Observe the `Future` returned by `Stream#toList` or
   `StreamSubscription#asFuture`.
 - [ ] Document the first source-to-listener lifecycle.
@@ -267,3 +267,6 @@ changes.
 - Recorded data, error, and done callbacks from an `async*` source. An uncaught
   exception in the generator becomes an error event with a stack trace, then
   the terminated generator closes the stream.
+- Compared error delivery paths: a synchronous exception is caught around its
+  function call, while an error event from an `async*` source is delivered to
+  the subscription's `onError` callback rather than thrown from `listen`.

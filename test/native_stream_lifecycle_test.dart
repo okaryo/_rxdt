@@ -13,6 +13,8 @@ Stream<int> _observedErrorSource(Object error) async* {
   throw error;
 }
 
+Never _throwSynchronously(Object error) => throw error;
+
 void main() {
   test('an async generator does not start before it is listened to', () async {
     final sourceEvents = <String>[];
@@ -76,8 +78,47 @@ void main() {
 
     await done.future;
 
-    expect(listenerEvents, ['listener:data:1', 'listener:error', 'listener:done']);
+    expect(listenerEvents, [
+      'listener:data:1',
+      'listener:error',
+      'listener:done',
+    ]);
     expect(observedError, same(expectedError));
     expect(observedStackTrace, isNotNull);
+  });
+
+  test('a synchronous exception is thrown to its caller', () {
+    final expectedError = StateError('outside stream');
+
+    expect(
+      () => _throwSynchronously(expectedError),
+      throwsA(same(expectedError)),
+    );
+  });
+
+  test('a stream error is delivered to onError instead of listen', () async {
+    final expectedError = StateError('inside stream');
+    final done = Completer<void>();
+    Object? caughtAroundListen;
+    Object? observedError;
+
+    try {
+      _observedErrorSource(expectedError).listen(
+        (_) {},
+        onError: (Object error) {
+          observedError = error;
+        },
+        onDone: done.complete,
+        cancelOnError: false,
+      );
+    } catch (error) {
+      caughtAroundListen = error;
+    }
+
+    expect(caughtAroundListen, isNull);
+
+    await done.future;
+
+    expect(observedError, same(expectedError));
   });
 }

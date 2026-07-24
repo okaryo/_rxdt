@@ -74,6 +74,41 @@ An error event does not universally mean that every stream must close. A stream
 source can emit an error and later emit more events. The generator closes here
 because its own body terminates after the uncaught exception.
 
-This experiment does not yet compare an error event with an exception thrown
-outside a stream. It also does not cover cancellation, pause and resume, or
-multiple listeners.
+## Error Event Versus Synchronous Exception
+
+A normal synchronous function reports failure directly to its caller:
+
+```dart
+Never throwSynchronously(Object error) => throw error;
+
+try {
+  throwSynchronously(error);
+} catch (caught) {
+  // Handles the exception from this call.
+}
+```
+
+Wrapping only `listen` in the same `try`/`catch` does not handle a later stream
+error:
+
+```dart
+try {
+  stream.listen(
+    onData,
+    onError: (Object error) {
+      // Handles an error event from the stream.
+    },
+  );
+} catch (error) {
+  // Handles a synchronous failure while setting up the subscription,
+  // not an error event delivered later.
+}
+```
+
+The distinction is the delivery path. A synchronous exception leaves the
+current function call by throwing. A stream error is an event delivered to an
+active subscription. For the `async*` source in this experiment, the exception
+thrown by the generator body is converted into that error event.
+
+This experiment does not yet cover exceptions thrown by listener callbacks,
+cancellation, pause and resume, or multiple listeners.
