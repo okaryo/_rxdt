@@ -85,7 +85,7 @@ Questions to answer:
 - [x] Forward data events without changing their values.
 - [x] Forward error events with their stack traces.
 - [x] Forward the done event exactly once.
-- [ ] Verify that creating the transformed stream does not eagerly listen.
+- [x] Verify that creating the transformed stream does not eagerly listen.
 - [x] Add tests for data, error, done, and ordering.
 
 Questions to answer:
@@ -277,3 +277,6 @@ changes.
   observes each event, then adds the same value to the downstream sink.
 - Verified that `tap` forwards error objects and stack traces unchanged,
   preserves data/error/done ordering, and delivers done exactly once.
+- Verified lazy binding: creating a tapped stream does not subscribe to its
+  source; the upstream subscription starts only when a downstream consumer
+  listens.

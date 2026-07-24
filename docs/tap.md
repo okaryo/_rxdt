@@ -66,5 +66,33 @@ This also demonstrates that an error event is not necessarily terminal. The
 source remains open after its error and can add another data event before
 closing.
 
-Laziness and callback failures still need separate tests before those behaviors
-are considered understood.
+## Lazy Subscription
+
+Calling `tap` binds a transformer and returns a new stream, but it does not
+subscribe to the source:
+
+```dart
+final tapped = source.tap(onData);
+```
+
+The test observes the source controller's `onListen` callback. Its count remains
+zero after the transformed stream is created. Only a downstream operation such
+as `tapped.listen(...)` or `tapped.drain()` causes the transformed stream to
+subscribe upstream.
+
+```text
+source.tap(...)
+  -> transformed Stream is created
+  -> source listen count: 0
+
+transformed.drain()
+  -> transformed Stream is listened to
+  -> transformer listens to source
+  -> source listen count: 1
+```
+
+This separation is important because a stream operator should describe a
+transformation without starting work before a consumer exists.
+
+Callback failures still need a separate test before that behavior is considered
+understood.

@@ -56,4 +56,24 @@ void main() {
     expect(downstreamStackTrace, same(expectedStackTrace));
     expect(doneCount, 1);
   });
+
+  test('tap does not listen to its source until downstream listens', () async {
+    var sourceListenCount = 0;
+    late final StreamController<int> controller;
+    controller = StreamController<int>(
+      onListen: () {
+        sourceListenCount++;
+        unawaited(controller.close());
+      },
+    );
+
+    final tapped = controller.stream.tap((_) {});
+
+    expect(sourceListenCount, 0);
+    expect(controller.hasListener, isFalse);
+
+    await tapped.drain<void>();
+
+    expect(sourceListenCount, 1);
+  });
 }
