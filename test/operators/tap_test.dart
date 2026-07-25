@@ -112,4 +112,31 @@ void main() {
 
     expect(sourceLifecycleEvents, ['onPause', 'onResume']);
   });
+
+  test('tap propagates cancellation and waits for source cleanup', () async {
+    final sourceCancelStarted = Completer<void>();
+    final allowSourceCleanup = Completer<void>();
+    final controller = StreamController<int>(
+      onCancel: () async {
+        sourceCancelStarted.complete();
+        await allowSourceCleanup.future;
+      },
+    );
+    final subscription = controller.stream.tap((_) {}).listen((_) {});
+    var downstreamCancelCompleted = false;
+
+    final downstreamCancel = subscription.cancel().then((_) {
+      downstreamCancelCompleted = true;
+    });
+
+    await sourceCancelStarted.future;
+
+    expect(downstreamCancelCompleted, isFalse);
+
+    allowSourceCleanup.complete();
+    await downstreamCancel;
+    await controller.close();
+
+    expect(downstreamCancelCompleted, isTrue);
+  });
 }

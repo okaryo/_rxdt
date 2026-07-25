@@ -80,5 +80,27 @@ The current `tap` implementation gets this behavior from the subscription
 plumbing provided by `StreamTransformer.fromHandlers`. The operator does not
 need to call `pause` or `resume` manually.
 
-This experiment does not yet inspect event buffering while paused or
-asynchronous cancellation cleanup.
+## Cancellation And Asynchronous Cleanup
+
+Canceling the downstream `tap` subscription cancels the internal upstream
+subscription. The source controller observes that transition through
+`onCancel`.
+
+An `onCancel` callback may return a `Future<void>` while the producer releases a
+resource. The future returned by the downstream subscription's `cancel()` does
+not complete until that upstream cleanup finishes.
+
+```text
+downstream.cancel()
+  -> upstream.cancel()
+  -> source onCancel starts
+  -> asynchronous cleanup
+  -> source onCancel completes
+  -> downstream cancel Future completes
+```
+
+Awaiting `cancel()` is therefore important when later work depends on the
+resource having been released, not merely on event delivery having stopped.
+
+This experiment does not yet inspect event buffering while paused or verify
+that no downstream events arrive after cancellation.
