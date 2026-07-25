@@ -76,4 +76,40 @@ void main() {
 
     expect(sourceListenCount, 1);
   });
+
+  test('tap propagates pause and resume to its source', () async {
+    final sourceLifecycleEvents = <String>[];
+    final sourceListened = Completer<void>();
+    final sourcePaused = Completer<void>();
+    final sourceResumed = Completer<void>();
+    final controller = StreamController<int>(
+      onListen: sourceListened.complete,
+      onPause: () {
+        sourceLifecycleEvents.add('onPause');
+        sourcePaused.complete();
+      },
+      onResume: () {
+        sourceLifecycleEvents.add('onResume');
+        sourceResumed.complete();
+      },
+    );
+
+    final subscription = controller.stream.tap((_) {}).listen((_) {});
+    await sourceListened.future;
+
+    subscription.pause();
+    await sourcePaused.future;
+
+    expect(controller.isPaused, isTrue);
+
+    subscription.resume();
+    await sourceResumed.future;
+
+    expect(controller.isPaused, isFalse);
+
+    await subscription.cancel();
+    await controller.close();
+
+    expect(sourceLifecycleEvents, ['onPause', 'onResume']);
+  });
 }

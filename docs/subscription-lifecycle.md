@@ -50,5 +50,35 @@ This is the coordination boundary between consumer demand and producer work.
 The callbacks do not automatically pause a timer, close a file, or stop another
 event source. They give the producer an opportunity to implement those actions.
 
-This experiment does not yet inspect event buffering while paused, asynchronous
-cancellation cleanup, or propagation through the `tap` transformer.
+## Propagation Through Tap
+
+The `tap` operator creates a downstream subscription and an internal upstream
+subscription:
+
+```text
+consumer
+  -> downstream tap subscription
+  -> upstream source subscription
+  -> StreamController
+```
+
+Pausing the downstream subscription pauses the internal source subscription, so
+the source controller receives `onPause`. Resuming downstream similarly causes
+the source controller to receive `onResume`.
+
+```text
+downstream.pause()
+  -> upstream.pause()
+  -> source onPause
+
+downstream.resume()
+  -> upstream.resume()
+  -> source onResume
+```
+
+The current `tap` implementation gets this behavior from the subscription
+plumbing provided by `StreamTransformer.fromHandlers`. The operator does not
+need to call `pause` or `resume` manually.
+
+This experiment does not yet inspect event buffering while paused or
+asynchronous cancellation cleanup.
