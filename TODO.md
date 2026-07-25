@@ -98,7 +98,7 @@ Questions to answer:
 
 ### 3. Subscription Lifecycle
 
-- [ ] Observe `onListen`, `onPause`, `onResume`, and `onCancel`.
+- [x] Observe `onListen`, `onPause`, `onResume`, and `onCancel`.
 - [ ] Propagate pause and resume to the upstream subscription.
 - [ ] Propagate cancellation and await asynchronous cleanup.
 - [ ] Verify that no downstream events arrive after cancellation.
@@ -280,3 +280,5 @@ changes.
 - Verified lazy binding: creating a tapped stream does not subscribe to its
   source; the upstream subscription starts only when a downstream consumer
   listens.
+- Observed the first subscription lifecycle: listen, pause, resume, and cancel
+  notify the producer through the corresponding `StreamController` callbacks.
