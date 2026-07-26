@@ -122,3 +122,5 @@ events without changing the values sent downstream.
 - `docs/tap.md`: public API and data path of the first stream operator.
 - `docs/subscription-lifecycle.md`: subscription state changes observed by a
   stream source.
+- `docs/event-delivery-and-stream-kinds.md`: synchronous and asynchronous event
+  delivery and later stream-kind comparisons.

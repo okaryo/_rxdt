@@ -114,7 +114,7 @@ Questions to answer:
 
 ### 4. Event Delivery And Stream Kinds
 
-- [ ] Compare asynchronous and synchronous `StreamController` delivery.
+- [x] Compare asynchronous and synchronous `StreamController` delivery.
 - [ ] Observe event-loop and microtask ordering.
 - [ ] Explore reentrant event production and its restrictions.
 - [ ] Compare single-subscription and broadcast streams.
