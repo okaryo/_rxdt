@@ -125,5 +125,48 @@ Cancellation differs from a done event. Canceling stops this subscription
 without invoking its `onDone` callback. For a broadcast stream, other active
 subscriptions can still receive later events.
 
-This experiment does not yet inspect event buffering while paused, callback
-replacement, or races between queued events and cancellation.
+## Replacing Listener Callbacks
+
+The callbacks passed to `listen` are stored by the returned subscription. While
+that subscription remains active, the consumer can replace them:
+
+```dart
+final subscription = stream.listen(initialOnData);
+
+subscription
+  ..onData(replacementOnData)
+  ..onError(replacementOnError)
+  ..onDone(replacementOnDone);
+```
+
+This does not create another subscription or cause the source to be listened to
+again. Events delivered before the replacement use the initial callbacks, and
+events delivered afterward use the replacement callbacks.
+
+Passing `null` to `onData` removes the data handler. Later data events are
+ignored by that subscription, but the subscription remains active and can
+still receive error and done events:
+
+```text
+data: 1
+  -> initial onData
+
+replace callbacks
+
+data: 2
+  -> replacement onData
+
+remove the data callback
+
+data: 3
+  -> ignored
+
+done
+  -> replacement onDone
+```
+
+Callback replacement is therefore mutation of the consumer-facing
+subscription, not a change to the producer or the stream itself.
+
+These experiments do not yet inspect event buffering while paused or races
+between queued events and cancellation.

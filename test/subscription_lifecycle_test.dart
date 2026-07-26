@@ -46,4 +46,69 @@ void main() {
       expect(lifecycleEvents, ['onListen', 'onPause', 'onResume', 'onCancel']);
     },
   );
+
+  test('subscription callbacks can be replaced while active', () async {
+    final events = <String>[];
+    final initialDataReceived = Completer<void>();
+    final replacementDataReceived = Completer<void>();
+    final replacementErrorReceived = Completer<void>();
+    final replacementDoneReceived = Completer<void>();
+    final expectedError = StateError('boom');
+    final expectedStackTrace = StackTrace.current;
+    Object? receivedError;
+    StackTrace? receivedStackTrace;
+    final controller = StreamController<int>();
+
+    final subscription = controller.stream.listen(
+      (value) {
+        events.add('initial:data:$value');
+        initialDataReceived.complete();
+      },
+      onError: (Object error, StackTrace stackTrace) {
+        events.add('initial:error');
+      },
+      onDone: () {
+        events.add('initial:done');
+      },
+    );
+
+    controller.add(1);
+    await initialDataReceived.future;
+
+    subscription
+      ..onData((value) {
+        events.add('replacement:data:$value');
+        replacementDataReceived.complete();
+      })
+      ..onError((Object error, StackTrace stackTrace) {
+        receivedError = error;
+        receivedStackTrace = stackTrace;
+        events.add('replacement:error');
+        replacementErrorReceived.complete();
+      })
+      ..onDone(() {
+        events.add('replacement:done');
+        replacementDoneReceived.complete();
+      });
+
+    controller.add(2);
+    await replacementDataReceived.future;
+
+    controller.addError(expectedError, expectedStackTrace);
+    await replacementErrorReceived.future;
+
+    subscription.onData(null);
+    controller.add(3);
+    await controller.close();
+    await replacementDoneReceived.future;
+
+    expect(events, [
+      'initial:data:1',
+      'replacement:data:2',
+      'replacement:error',
+      'replacement:done',
+    ]);
+    expect(receivedError, same(expectedError));
+    expect(receivedStackTrace, same(expectedStackTrace));
+  });
 }

@@ -102,7 +102,7 @@ Questions to answer:
 - [x] Propagate pause and resume to the upstream subscription.
 - [x] Propagate cancellation and await asynchronous cleanup.
 - [x] Verify that no downstream events arrive after cancellation.
-- [ ] Explore callback replacement on `StreamSubscription`.
+- [x] Explore callback replacement on `StreamSubscription`.
 - [ ] Add tests for cleanup and cancellation races.
 
 Questions to answer:
