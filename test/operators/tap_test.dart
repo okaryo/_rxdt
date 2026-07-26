@@ -162,4 +162,40 @@ void main() {
     expect(tappedData, [1]);
     expect(downstreamData, [1]);
   });
+
+  test('tap cancellation wins over queued events while cleanup runs', () async {
+    final sourceCancelStarted = Completer<void>();
+    final allowSourceCleanup = Completer<void>();
+    final controller = StreamController<int>(
+      onCancel: () async {
+        sourceCancelStarted.complete();
+        await allowSourceCleanup.future;
+      },
+    );
+    final tappedData = <int>[];
+    final downstreamEvents = <String>[];
+    final subscription = controller.stream
+        .tap(tappedData.add)
+        .listen(
+          (value) => downstreamEvents.add('data:$value'),
+          onDone: () => downstreamEvents.add('done'),
+        );
+
+    controller.add(1);
+    final closeFuture = controller.close();
+    final cancelFuture = subscription.cancel();
+
+    await sourceCancelStarted.future;
+    await Future<void>.delayed(Duration.zero);
+
+    expect(tappedData, isEmpty);
+    expect(downstreamEvents, isEmpty);
+
+    allowSourceCleanup.complete();
+    await cancelFuture;
+    await closeFuture;
+
+    expect(tappedData, isEmpty);
+    expect(downstreamEvents, isEmpty);
+  });
 }

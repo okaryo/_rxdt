@@ -125,6 +125,31 @@ Cancellation differs from a done event. Canceling stops this subscription
 without invoking its `onDone` callback. For a broadcast stream, other active
 subscriptions can still receive later events.
 
+## Cancellation Versus Queued Events
+
+An asynchronous controller can have data and done events queued for later
+delivery when the consumer calls `cancel()`. Cancellation takes effect on the
+subscription before its returned cleanup future completes:
+
+```text
+source queues data
+source queues done
+consumer calls cancel
+  -> queued data is not delivered
+  -> queued done is not delivered
+  -> source onCancel starts asynchronous cleanup
+  -> cancel Future waits for cleanup
+```
+
+The absence of callbacks and the completion of cancellation are therefore two
+different observations. Event delivery has already stopped while the
+`cancel()` future is still waiting for the producer to release its resources.
+
+The focused test exercises this through `tap`, verifying that neither the tap
+callback nor the downstream callbacks see the queued event. It also verifies
+that canceling suppresses `onDone`, even when the controller had already
+requested `close()`.
+
 ## Replacing Listener Callbacks
 
 The callbacks passed to `listen` are stored by the returned subscription. While
@@ -168,5 +193,4 @@ done
 Callback replacement is therefore mutation of the consumer-facing
 subscription, not a change to the producer or the stream itself.
 
-These experiments do not yet inspect event buffering while paused or races
-between queued events and cancellation.
+These experiments do not yet inspect event buffering while paused.

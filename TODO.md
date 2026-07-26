@@ -103,7 +103,7 @@ Questions to answer:
 - [x] Propagate cancellation and await asynchronous cleanup.
 - [x] Verify that no downstream events arrive after cancellation.
 - [x] Explore callback replacement on `StreamSubscription`.
-- [ ] Add tests for cleanup and cancellation races.
+- [x] Add tests for cleanup and cancellation races.
 
 Questions to answer:
 
