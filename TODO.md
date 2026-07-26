@@ -101,7 +101,7 @@ Questions to answer:
 - [x] Observe `onListen`, `onPause`, `onResume`, and `onCancel`.
 - [x] Propagate pause and resume to the upstream subscription.
 - [x] Propagate cancellation and await asynchronous cleanup.
-- [ ] Verify that no downstream events arrive after cancellation.
+- [x] Verify that no downstream events arrive after cancellation.
 - [ ] Explore callback replacement on `StreamSubscription`.
 - [ ] Add tests for cleanup and cancellation races.
 
@@ -286,3 +286,5 @@ changes.
   through the transformer to the upstream source subscription.
 - Verified that canceling a tapped downstream subscription cancels upstream and
   that its returned future waits for asynchronous source cleanup.
+- Verified that after downstream cancellation, later source events reach
+  neither the `tap` callback nor the downstream listener.

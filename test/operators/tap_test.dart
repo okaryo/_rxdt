@@ -139,4 +139,27 @@ void main() {
 
     expect(downstreamCancelCompleted, isTrue);
   });
+
+  test('tap delivers no events after downstream cancellation', () async {
+    final controller = StreamController<int>();
+    final tappedData = <int>[];
+    final downstreamData = <int>[];
+    final firstEventReceived = Completer<void>();
+    final subscription = controller.stream.tap(tappedData.add).listen((value) {
+      downstreamData.add(value);
+      firstEventReceived.complete();
+    });
+
+    controller.add(1);
+    await firstEventReceived.future;
+
+    await subscription.cancel();
+
+    controller.add(2);
+    await controller.close();
+    await Future<void>.delayed(Duration.zero);
+
+    expect(tappedData, [1]);
+    expect(downstreamData, [1]);
+  });
 }

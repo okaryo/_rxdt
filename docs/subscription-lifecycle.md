@@ -102,5 +102,28 @@ downstream.cancel()
 Awaiting `cancel()` is therefore important when later work depends on the
 resource having been released, not merely on event delivery having stopped.
 
-This experiment does not yet inspect event buffering while paused or verify
-that no downstream events arrive after cancellation.
+## Event Delivery After Cancellation
+
+Once `cancel()` completes, the subscription no longer delivers events. The
+test first waits until one data event has passed through `tap`, then cancels the
+downstream subscription. A later value added by the source reaches neither the
+tap callback nor the downstream listener.
+
+```text
+source data: 1
+  -> tap callback: 1
+  -> downstream: 1
+
+downstream.cancel()
+
+source attempts data: 2
+  -> no tap callback
+  -> no downstream callback
+```
+
+Cancellation differs from a done event. Canceling stops this subscription
+without invoking its `onDone` callback. For a broadcast stream, other active
+subscriptions can still receive later events.
+
+This experiment does not yet inspect event buffering while paused, callback
+replacement, or races between queued events and cancellation.
