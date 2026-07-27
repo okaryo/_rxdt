@@ -241,5 +241,45 @@ void main() {
       expect(firstEvents, [1, 2]);
       expect(secondEvents, [2, 3]);
     });
+
+    test('a broadcast controller can start production lazily', () async {
+      var productionStartCount = 0;
+      final received = Completer<int>();
+      late final StreamController<int> controller;
+      controller = StreamController<int>.broadcast(
+        onListen: () {
+          productionStartCount++;
+          controller.add(1);
+        },
+      );
+
+      expect(controller.stream.isBroadcast, isTrue);
+      expect(productionStartCount, 0);
+
+      final subscription = controller.stream.listen(received.complete);
+      expect(await received.future, 1);
+      expect(productionStartCount, 1);
+
+      await subscription.cancel();
+      await controller.close();
+    });
+
+    test(
+      'a single-subscription controller can produce before listen',
+      () async {
+        final controller = StreamController<int>();
+
+        expect(controller.stream.isBroadcast, isFalse);
+        expect(controller.hasListener, isFalse);
+
+        controller.add(1);
+        final closeFuture = controller.close();
+
+        final events = await controller.stream.toList();
+        await closeFuture;
+
+        expect(events, [1]);
+      },
+    );
   });
 }

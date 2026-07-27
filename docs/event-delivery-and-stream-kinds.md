@@ -251,5 +251,75 @@ called is not sufficient. A listener must still be subscribed when the queued
 event is actually delivered. This is why canceling before delivery can suppress
 an event that was added while the subscription existed.
 
+## Cold And Hot Terminology
+
+Cold and hot are informal descriptions of the producer lifecycle:
+
+- A cold source generally starts a fresh production lifecycle for a consumer.
+- A hot source has a lifecycle independent of a particular consumer, so a
+  consumer observes only the portion available while it is attached.
+
+Single-subscription and broadcast are a different, formal Dart API
+classification:
+
+- Single-subscription answers that one `Stream` instance accepts one
+  subscription.
+- Broadcast answers that one `Stream` instance accepts multiple subscriptions.
+
+The two axes often appear together as cold single-subscription streams and hot
+broadcast streams, but one does not imply the other.
+
+A broadcast controller can remain completely lazy until its first listener:
+
+```text
+create broadcast controller
+  -> producer has not started
+
+first listener subscribes
+  -> onListen starts producer
+```
+
+Being broadcast therefore does not mean that production was already running.
+It describes subscription topology, not the source's start condition.
+
+Conversely, a producer can add an event to a single-subscription controller
+before its only listener exists:
+
+```text
+single-subscription controller
+producer adds 1
+first listener subscribes
+  -> receives buffered 1
+```
+
+The producer acted independently of the consumer even though the stream is not
+broadcast. The controller's pre-listen buffer changes what that eventual
+consumer observes, showing that "hot" also does not automatically mean "late
+events are always lost."
+
+For a conventional cold sequence, a factory commonly creates a fresh
+single-subscription stream for each consumer:
+
+```dart
+Stream<int> createSequence() async* {
+  yield 1;
+  yield 2;
+}
+
+createSequence().listen(firstListener);
+createSequence().listen(secondListener);
+```
+
+Those are two stream instances and two production lifecycles. By contrast,
+`asBroadcastStream` can share one underlying subscription: it connects lazily
+when the first listener arrives, then behaves like a live shared sequence.
+
+Instead of inferring behavior from cold or hot alone, ask concrete questions:
+
+1. What starts and stops the producer?
+2. Does each listener get a fresh producer or share one?
+3. Are events retained while no listener exists?
+4. What does a late listener receive?
+
 These experiments do not yet cover per-listener buffering while one broadcast
 subscription is paused.

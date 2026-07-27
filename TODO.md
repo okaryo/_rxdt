@@ -119,7 +119,7 @@ Questions to answer:
 - [x] Explore reentrant event production and its restrictions.
 - [x] Compare single-subscription and broadcast streams.
 - [x] Observe the behavior of late and multiple listeners.
-- [ ] Relate cold and hot terminology to concrete Dart stream behavior.
+- [x] Relate cold and hot terminology to concrete Dart stream behavior.
 - [ ] Decide which stream kind each operator preserves.
 
 Questions to answer:
