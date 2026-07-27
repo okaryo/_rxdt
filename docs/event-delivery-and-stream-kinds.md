@@ -207,7 +207,49 @@ final second = controller.stream.listen(secondListener);
 Each `listen` returns a separate `StreamSubscription`. Canceling one
 subscription does not cancel the others or close the controller.
 
-This classification answers who may subscribe, but it does not yet answer
-which events late listeners receive, what happens while a broadcast stream has
-no listeners, or how paused listeners behave. Those delivery differences are
-the next experiment.
+## Late And Multiple Broadcast Listeners
+
+A broadcast stream sends an event only to subscriptions that are active for
+that event. It does not retain an event as history for future listeners.
+
+The experiment changes the listener set between events:
+
+```text
+add 0 with no listeners
+  -> dropped
+
+first listener subscribes
+
+add 1
+  -> first receives 1
+
+second listener subscribes
+
+add 2
+  -> first receives 2
+  -> second receives 2
+
+first listener cancels
+
+add 3
+  -> second receives 3
+```
+
+The resulting histories are:
+
+```text
+first:  [1, 2]
+second: [2, 3]
+```
+
+The second listener is late, so it does not receive `0` or `1`. Canceling the
+first subscription affects only that subscription; it does not stop the source
+or the second subscription.
+
+For an asynchronous broadcast controller, being active only when `add` is
+called is not sufficient. A listener must still be subscribed when the queued
+event is actually delivered. This is why canceling before delivery can suppress
+an event that was added while the subscription existed.
+
+These experiments do not yet cover per-listener buffering while one broadcast
+subscription is paused.

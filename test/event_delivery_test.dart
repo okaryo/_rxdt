@@ -194,5 +194,52 @@ void main() {
       await secondSubscription.cancel();
       await controller.close();
     });
+
+    test('a broadcast stream only delivers to current listeners', () async {
+      final firstEvents = <int>[];
+      final secondEvents = <int>[];
+      final firstReceivedOne = Completer<void>();
+      final firstReceivedTwo = Completer<void>();
+      final secondReceivedTwo = Completer<void>();
+      final secondReceivedThree = Completer<void>();
+      final controller = StreamController<int>.broadcast();
+
+      controller.add(0);
+
+      final firstSubscription = controller.stream.listen((value) {
+        firstEvents.add(value);
+
+        if (value == 1) {
+          firstReceivedOne.complete();
+        } else if (value == 2) {
+          firstReceivedTwo.complete();
+        }
+      });
+
+      controller.add(1);
+      await firstReceivedOne.future;
+
+      controller.stream.listen((value) {
+        secondEvents.add(value);
+
+        if (value == 2) {
+          secondReceivedTwo.complete();
+        } else if (value == 3) {
+          secondReceivedThree.complete();
+        }
+      });
+
+      controller.add(2);
+      await Future.wait([firstReceivedTwo.future, secondReceivedTwo.future]);
+
+      await firstSubscription.cancel();
+
+      controller.add(3);
+      await secondReceivedThree.future;
+      await controller.close();
+
+      expect(firstEvents, [1, 2]);
+      expect(secondEvents, [2, 3]);
+    });
   });
 }
