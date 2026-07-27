@@ -167,4 +167,32 @@ void main() {
       },
     );
   });
+
+  group('stream kinds', () {
+    test('a single-subscription stream can only be listened to once', () async {
+      final controller = StreamController<int>();
+
+      expect(controller.stream.isBroadcast, isFalse);
+
+      final firstSubscription = controller.stream.listen((_) {});
+      await firstSubscription.cancel();
+
+      expect(() => controller.stream.listen((_) {}), throwsStateError);
+
+      await controller.close();
+    });
+
+    test('a broadcast stream accepts multiple subscriptions', () async {
+      final controller = StreamController<int>.broadcast();
+
+      expect(controller.stream.isBroadcast, isTrue);
+
+      final firstSubscription = controller.stream.listen((_) {});
+      final secondSubscription = controller.stream.listen((_) {});
+
+      await firstSubscription.cancel();
+      await secondSubscription.cancel();
+      await controller.close();
+    });
+  });
 }

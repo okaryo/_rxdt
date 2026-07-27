@@ -163,5 +163,51 @@ This is one reason `sync: true` is a behavioral contract rather than a general
 performance switch. Producer methods reachable from listeners must be audited
 for nested calls and partially updated state.
 
-These experiments do not yet compare single-subscription and broadcast stream
-listener behavior.
+## Single-Subscription And Broadcast Streams
+
+This distinction describes how many subscriptions one `Stream` instance
+accepts over its lifetime.
+
+A stream from the default controller is single-subscription:
+
+```dart
+final controller = StreamController<int>();
+
+controller.stream.isBroadcast; // false
+```
+
+It accepts exactly one call to `listen`. Canceling that subscription does not
+reset the stream or make room for another listener:
+
+```text
+first listen
+  -> accepted
+
+first subscription cancels
+
+second listen
+  -> StateError
+```
+
+The word "single" therefore means one subscription over the stream instance's
+lifetime, not merely one active subscription at a time.
+
+A broadcast controller creates a stream that accepts any number of
+subscriptions:
+
+```dart
+final controller = StreamController<int>.broadcast();
+
+controller.stream.isBroadcast; // true
+
+final first = controller.stream.listen(firstListener);
+final second = controller.stream.listen(secondListener);
+```
+
+Each `listen` returns a separate `StreamSubscription`. Canceling one
+subscription does not cancel the others or close the controller.
+
+This classification answers who may subscribe, but it does not yet answer
+which events late listeners receive, what happens while a broadcast stream has
+no listeners, or how paused listeners behave. Those delivery differences are
+the next experiment.
