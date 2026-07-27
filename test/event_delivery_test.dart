@@ -242,43 +242,63 @@ void main() {
       expect(secondEvents, [2, 3]);
     });
 
-    test('a broadcast controller can start production lazily', () async {
+    test('a cold source starts a fresh producer for each consumer', () async {
       var productionStartCount = 0;
-      final received = Completer<int>();
-      late final StreamController<int> controller;
-      controller = StreamController<int>.broadcast(
-        onListen: () {
-          productionStartCount++;
-          controller.add(1);
-        },
-      );
 
-      expect(controller.stream.isBroadcast, isTrue);
+      Stream<int> createColdStream() async* {
+        productionStartCount++;
+        yield 1;
+        yield 2;
+      }
+
       expect(productionStartCount, 0);
 
-      final subscription = controller.stream.listen(received.complete);
-      expect(await received.future, 1);
+      final firstEvents = await createColdStream().toList();
       expect(productionStartCount, 1);
 
-      await subscription.cancel();
-      await controller.close();
+      final secondEvents = await createColdStream().toList();
+      expect(productionStartCount, 2);
+
+      expect(firstEvents, [1, 2]);
+      expect(secondEvents, [1, 2]);
     });
 
     test(
-      'a single-subscription controller can produce before listen',
+      'a hot shared stream has one producer and late listeners join midway',
       () async {
-        final controller = StreamController<int>();
+        var productionStartCount = 0;
+        final allowSecondEvent = Completer<void>();
+        final firstReceivedOne = Completer<void>();
+        final firstDone = Completer<void>();
+        final secondDone = Completer<void>();
+        final firstEvents = <int>[];
+        final secondEvents = <int>[];
 
-        expect(controller.stream.isBroadcast, isFalse);
-        expect(controller.hasListener, isFalse);
+        Stream<int> createSource() async* {
+          productionStartCount++;
+          yield 1;
+          await allowSecondEvent.future;
+          yield 2;
+        }
 
-        controller.add(1);
-        final closeFuture = controller.close();
+        final sharedStream = createSource().asBroadcastStream();
 
-        final events = await controller.stream.toList();
-        await closeFuture;
+        sharedStream.listen((value) {
+          firstEvents.add(value);
+          if (value == 1) {
+            firstReceivedOne.complete();
+          }
+        }, onDone: firstDone.complete);
+        await firstReceivedOne.future;
 
-        expect(events, [1]);
+        sharedStream.listen(secondEvents.add, onDone: secondDone.complete);
+
+        allowSecondEvent.complete();
+        await Future.wait([firstDone.future, secondDone.future]);
+
+        expect(productionStartCount, 1);
+        expect(firstEvents, [1, 2]);
+        expect(secondEvents, [2]);
       },
     );
   });

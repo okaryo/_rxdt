@@ -269,36 +269,26 @@ classification:
 The two axes often appear together as cold single-subscription streams and hot
 broadcast streams, but one does not imply the other.
 
-A broadcast controller can remain completely lazy until its first listener:
+The tests use the conventional examples directly. A cold factory creates a
+fresh stream and producer lifecycle for each consumer:
 
 ```text
-create broadcast controller
-  -> producer has not started
+create cold stream for first consumer
+  -> producer starts
+  -> first receives 1, 2
 
-first listener subscribes
-  -> onListen starts producer
+create cold stream for second consumer
+  -> another producer starts
+  -> second receives 1, 2
 ```
 
-Being broadcast therefore does not mean that production was already running.
-It describes subscription topology, not the source's start condition.
-
-Conversely, a producer can add an event to a single-subscription controller
-before its only listener exists:
+The test verifies both complete sequences and a production start count of two:
 
 ```text
-single-subscription controller
-producer adds 1
-first listener subscribes
-  -> receives buffered 1
+first:  [1, 2]
+second: [1, 2]
+producer starts: 2
 ```
-
-The producer acted independently of the consumer even though the stream is not
-broadcast. The controller's pre-listen buffer changes what that eventual
-consumer observes, showing that "hot" also does not automatically mean "late
-events are always lost."
-
-For a conventional cold sequence, a factory commonly creates a fresh
-single-subscription stream for each consumer:
 
 ```dart
 Stream<int> createSequence() async* {
@@ -310,9 +300,35 @@ createSequence().listen(firstListener);
 createSequence().listen(secondListener);
 ```
 
-Those are two stream instances and two production lifecycles. By contrast,
-`asBroadcastStream` can share one underlying subscription: it connects lazily
-when the first listener arrives, then behaves like a live shared sequence.
+By contrast, the hot example converts one source to a shared stream with
+`asBroadcastStream`. The first listener starts the one upstream subscription.
+After it receives `1`, a second listener joins before the source emits `2`:
+
+```text
+shared producer starts once
+
+emit 1
+  -> first receives 1
+
+second listener joins
+
+emit 2
+  -> first receives 2
+  -> second receives 2
+```
+
+The result makes the shared timeline visible:
+
+```text
+first:  [1, 2]
+second: [2]
+producer starts: 1
+```
+
+Although the first listener triggers the initial connection, the second
+listener does not receive a fresh producer or a fresh sequence. It joins the
+one already-running production lifecycle midway. That shared-lifecycle behavior
+is the important hot property in this experiment.
 
 Instead of inferring behavior from cold or hot alone, ask concrete questions:
 
