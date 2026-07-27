@@ -44,4 +44,55 @@ void main() {
       await controller.close();
     });
   });
+
+  test(
+    'an asynchronous controller delivers from the microtask queue',
+    () async {
+      final events = <String>[];
+      final eventQueueTurnRan = Completer<void>();
+      final controller = StreamController<int>();
+
+      controller.stream.listen((value) {
+        events.add('stream:data:$value');
+        scheduleMicrotask(() {
+          events.add('microtask:from-listener');
+        });
+      });
+
+      events.add('sync:start');
+
+      scheduleMicrotask(() {
+        events.add('microtask:before-add');
+      });
+
+      controller.add(1);
+
+      scheduleMicrotask(() {
+        events.add('microtask:after-add');
+      });
+
+      Timer.run(() {
+        events.add('event-queue:timer');
+        eventQueueTurnRan.complete();
+      });
+
+      events.add('sync:end');
+
+      expect(events, ['sync:start', 'sync:end']);
+
+      await eventQueueTurnRan.future;
+
+      expect(events, [
+        'sync:start',
+        'sync:end',
+        'microtask:before-add',
+        'stream:data:1',
+        'microtask:after-add',
+        'microtask:from-listener',
+        'event-queue:timer',
+      ]);
+
+      await controller.close();
+    },
+  );
 }
