@@ -119,5 +119,49 @@ Long synchronous work delays both queues. Continually scheduling more
 microtasks can likewise prevent the event queue from reaching a `Timer`; this
 is often called event-queue starvation.
 
-These experiments do not yet exercise reentrant production restrictions or
-compare single-subscription and broadcast streams.
+## Reentrant Event Production
+
+Reentrancy occurs when a callback invoked by a producer calls back into that
+producer before the original operation has returned.
+
+With a synchronous broadcast controller, a listener runs inside `add`. If that
+listener calls `add` on the same controller, the second call occurs while the
+first event is still being delivered:
+
+```text
+producer add(1)
+  -> listener receives 1
+    -> listener calls add(2)
+      -> rejected with StateError
+  -> listener returns
+producer add(1) returns
+```
+
+A synchronous broadcast controller must finish delivering one event to all
+current listeners before another `add`, `addError`, or `close` begins. Rejecting
+the nested operation prevents different listeners from observing events in
+inconsistent orders.
+
+With an asynchronous broadcast controller, the original producer call has
+already returned before the listener runs:
+
+```text
+producer add(1)
+producer add(1) returns
+
+listener receives 1
+  -> listener calls add(2)
+  -> data 2 is queued
+
+listener receives 2
+```
+
+The listener still causes further production, but it does not reenter an active
+`add` call. The second event is delivered later, preserving the event order.
+
+This is one reason `sync: true` is a behavioral contract rather than a general
+performance switch. Producer methods reachable from listeners must be audited
+for nested calls and partially updated state.
+
+These experiments do not yet compare single-subscription and broadcast stream
+listener behavior.

@@ -95,4 +95,76 @@ void main() {
       await controller.close();
     },
   );
+
+  group('reentrant event production', () {
+    test('a synchronous broadcast controller rejects reentrant add', () async {
+      final events = <String>[];
+      Object? reentrantError;
+      final controller = StreamController<int>.broadcast(sync: true);
+
+      controller.stream.listen((value) {
+        events.add('listener:start:$value');
+
+        try {
+          controller.add(value + 1);
+        } on StateError catch (error) {
+          reentrantError = error;
+          events.add('reentrant:add:rejected');
+        }
+
+        events.add('listener:end:$value');
+      });
+
+      events.add('producer:before-add');
+      controller.add(1);
+      events.add('producer:after-add');
+
+      expect(events, [
+        'producer:before-add',
+        'listener:start:1',
+        'reentrant:add:rejected',
+        'listener:end:1',
+        'producer:after-add',
+      ]);
+      expect(reentrantError, isA<StateError>());
+
+      await controller.close();
+    });
+
+    test(
+      'an asynchronous broadcast controller queues add from listener',
+      () async {
+        final events = <String>[];
+        final secondEventDelivered = Completer<void>();
+        final controller = StreamController<int>.broadcast();
+
+        controller.stream.listen((value) {
+          events.add('listener:data:$value');
+
+          if (value == 1) {
+            controller.add(2);
+          } else {
+            secondEventDelivered.complete();
+          }
+        });
+
+        events.add('producer:before-add');
+        controller.add(1);
+        events.add('producer:after-add');
+
+        expect(events, ['producer:before-add', 'producer:after-add']);
+
+        await secondEventDelivered.future;
+
+        expect(events, [
+          'producer:before-add',
+          'producer:after-add',
+          'listener:data:1',
+          'listener:data:2',
+        ]);
+
+        await controller.close();
+      },
+    );
+  });
 }

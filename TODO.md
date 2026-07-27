@@ -116,7 +116,7 @@ Questions to answer:
 
 - [x] Compare asynchronous and synchronous `StreamController` delivery.
 - [x] Observe event-loop and microtask ordering.
-- [ ] Explore reentrant event production and its restrictions.
+- [x] Explore reentrant event production and its restrictions.
 - [ ] Compare single-subscription and broadcast streams.
 - [ ] Observe the behavior of late and multiple listeners.
 - [ ] Relate cold and hot terminology to concrete Dart stream behavior.
