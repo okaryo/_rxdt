@@ -26,13 +26,18 @@ Initial focus:
 
 ## Core Milestone Status
 
-Core milestone not complete.
+Core milestone complete.
 
 The initial core milestone is to make one complete stream transformation
 lifecycle visible: listen to a source, observe events in a tiny `tap`-style
 operator, forward data, error, and done unchanged, and clean up correctly. More
 complex reactive behavior should be introduced only after this lifecycle is
 easy to inspect and explain.
+
+The `tap` operator now preserves data, error, done, laziness, subscription
+control, cancellation cleanup, and the source's single-subscription or
+broadcast kind. The next milestone is to compare stateless and stateful
+operators while keeping these lifecycle properties intact.
 
 ## Roadmap
 
@@ -120,7 +125,7 @@ Questions to answer:
 - [x] Compare single-subscription and broadcast streams.
 - [x] Observe the behavior of late and multiple listeners.
 - [x] Relate cold and hot terminology to concrete Dart stream behavior.
-- [ ] Decide which stream kind each operator preserves.
+- [x] Decide which stream kind each operator preserves.
 
 Questions to answer:
 

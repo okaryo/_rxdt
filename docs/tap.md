@@ -94,5 +94,58 @@ transformed.drain()
 This separation is important because a stream operator should describe a
 transformation without starting work before a consumer exists.
 
+## Preserving The Source Stream Kind
+
+`tap` is a one-to-one observation operator, so it should not change who may
+subscribe to the sequence. The returned stream preserves the source kind:
+
+```text
+single-subscription source
+  -> tap
+  -> single-subscription result
+
+broadcast source
+  -> tap
+  -> broadcast result
+```
+
+The single-subscription test verifies both `isBroadcast == false` and that a
+second `listen` fails after the first subscription is canceled. The broadcast
+test verifies `isBroadcast == true` and accepts two simultaneous listeners.
+
+With a broadcast source, each downstream `listen` creates its own transformed
+subscription:
+
+```text
+broadcast source event: 1
+  -> first tap subscription
+    -> tap callback: 1
+    -> first listener: 1
+
+  -> second tap subscription
+    -> tap callback: 1
+    -> second listener: 1
+```
+
+The tap callback therefore runs twice for one source event when two downstream
+listeners are subscribed. `tap` preserves broadcasting; it does not place one
+shared tap callback in front of all listeners.
+
+Operator placement changes that observation count:
+
+```text
+source.tap(callback).asBroadcastStream()
+  -> tap is upstream of sharing
+  -> callback runs once per source event
+
+source.asBroadcastStream().tap(callback)
+  -> tap is downstream of sharing
+  -> callback runs once per downstream subscription
+```
+
+Ordinary one-to-one transformation and filtering operators should preserve the
+source kind unless their documented purpose is to change subscription sharing,
+such as a future multicast or subject operator.
+
 Callback failures still need a separate test before that behavior is considered
 understood.

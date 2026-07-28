@@ -198,4 +198,47 @@ void main() {
     expect(tappedData, isEmpty);
     expect(downstreamEvents, isEmpty);
   });
+
+  test('tap preserves a single-subscription source', () async {
+    final controller = StreamController<int>();
+    final tapped = controller.stream.tap((_) {});
+
+    expect(tapped.isBroadcast, isFalse);
+
+    final firstSubscription = tapped.listen((_) {});
+    await firstSubscription.cancel();
+
+    expect(() => tapped.listen((_) {}), throwsStateError);
+
+    await controller.close();
+  });
+
+  test('tap preserves a broadcast source', () async {
+    final tappedData = <int>[];
+    final firstEvents = <int>[];
+    final secondEvents = <int>[];
+    final firstReceived = Completer<void>();
+    final secondReceived = Completer<void>();
+    final controller = StreamController<int>.broadcast();
+    final tapped = controller.stream.tap(tappedData.add);
+
+    expect(tapped.isBroadcast, isTrue);
+
+    tapped.listen((value) {
+      firstEvents.add(value);
+      firstReceived.complete();
+    });
+    tapped.listen((value) {
+      secondEvents.add(value);
+      secondReceived.complete();
+    });
+
+    controller.add(1);
+    await Future.wait([firstReceived.future, secondReceived.future]);
+    await controller.close();
+
+    expect(firstEvents, [1]);
+    expect(secondEvents, [1]);
+    expect(tappedData, [1, 1]);
+  });
 }

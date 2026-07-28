@@ -69,7 +69,7 @@ property of Dart streams or reactive programming.
 
 ## Core Milestone
 
-The core learning milestone is not complete yet.
+The first core learning milestone is complete.
 
 The first target is to make the smallest source-to-listener lifecycle visible by
 building a tiny `tap`-style stream operator that:
@@ -81,9 +81,10 @@ building a tiny `tap`-style stream operator that:
 - Makes source, transformer, subscription, and listener boundaries explicit.
 - Includes tests or examples that show event ordering and lifecycle behavior.
 
-Pausing, cancellation, broadcast behavior, stateful operators, stream
-composition, timing, multicasting, and subjects should be introduced as later
-learning steps.
+The project has also verified pause, cancellation, asynchronous cleanup, and
+preservation of single-subscription and broadcast behavior. Stateful operators,
+stream composition, timing, multicasting, and subjects remain later learning
+steps.
 
 ## Approach
 
