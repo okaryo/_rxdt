@@ -80,6 +80,25 @@ stream.
 The transformed stream also preserves the source's single-subscription or
 broadcast kind.
 
-A focused broadcast test will next verify that the two sink instances really
-maintain independent histories. Custom equality and equality-callback failures
-remain later learning steps.
+The broadcast test verifies the state boundary by adding the second listener
+after the first listener has already remembered `1`:
+
+```text
+first listener subscribes
+source emits 1
+  -> first emits 1 and remembers 1
+
+second listener subscribes
+source emits 1
+  -> first suppresses it as a duplicate
+  -> second emits it as its first value
+
+source emits 2
+  -> both emit 2
+```
+
+Both histories become `[1, 2]`, but they arrive there through different
+decisions. If the previous value were shared, the second listener's first `1`
+would incorrectly be suppressed.
+
+Custom equality and equality-callback failures remain later learning steps.

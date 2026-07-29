@@ -58,4 +58,51 @@ void main() {
     expect(single.isBroadcast, isFalse);
     expect(broadcast.isBroadcast, isTrue);
   });
+
+  test('distinctValue owns previous-value state per subscription', () async {
+    final firstEvents = <int>[];
+    final secondEvents = <int>[];
+    final firstReceivedOne = Completer<void>();
+    final secondReceivedOne = Completer<void>();
+    final firstReceivedTwo = Completer<void>();
+    final secondReceivedTwo = Completer<void>();
+    final controller = StreamController<int>.broadcast();
+    final distinct = controller.stream.distinctValue();
+
+    distinct.listen((value) {
+      firstEvents.add(value);
+
+      if (value == 1) {
+        firstReceivedOne.complete();
+      } else if (value == 2) {
+        firstReceivedTwo.complete();
+      }
+    });
+
+    controller.add(1);
+    await firstReceivedOne.future;
+
+    distinct.listen((value) {
+      secondEvents.add(value);
+
+      if (value == 1) {
+        secondReceivedOne.complete();
+      } else if (value == 2) {
+        secondReceivedTwo.complete();
+      }
+    });
+
+    controller.add(1);
+    await secondReceivedOne.future;
+
+    expect(firstEvents, [1]);
+    expect(secondEvents, [1]);
+
+    controller.add(2);
+    await Future.wait([firstReceivedTwo.future, secondReceivedTwo.future]);
+    await controller.close();
+
+    expect(firstEvents, [1, 2]);
+    expect(secondEvents, [1, 2]);
+  });
 }
