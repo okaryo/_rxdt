@@ -112,7 +112,8 @@ represents stream completion as a `Future`. A first `tap` operator observes data
 events without changing the values sent downstream. A stateless `mapValue`
 operator changes each data event's type while preserving errors, completion,
 and the source stream kind. A stateless `filterValue` operator tests each data
-event and forwards only accepted values.
+event and forwards only accepted values. A stateful `distinctValue` operator
+remembers the most recently emitted data and removes consecutive duplicates.
 
 ## Project Documents
 
@@ -128,6 +129,8 @@ event and forwards only accepted values.
   lifecycle behavior.
 - `docs/filter-value.md`: stateless predicate-based filtering and event
   forwarding behavior.
+- `docs/distinct-value.md`: consecutive duplicate suppression and
+  per-subscription state structure.
 - `docs/subscription-lifecycle.md`: subscription state changes observed by a
   stream source.
 - `docs/event-delivery-and-stream-kinds.md`: synchronous and asynchronous event

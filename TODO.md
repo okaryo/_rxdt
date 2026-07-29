@@ -139,7 +139,7 @@ Questions to answer:
 
 - [x] Implement one stateless transforming operator.
 - [x] Implement one stateless filtering operator.
-- [ ] Implement `distinct` or another small stateful operator.
+- [x] Implement `distinct` or another small stateful operator.
 - [ ] Ensure state is owned per subscription.
 - [ ] Decide how operator callbacks surface thrown exceptions.
 - [ ] Compare selected behavior with Dart's built-in stream methods.
