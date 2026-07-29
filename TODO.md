@@ -138,7 +138,7 @@ Questions to answer:
 ### 5. Stateless And Stateful Operators
 
 - [x] Implement one stateless transforming operator.
-- [ ] Implement one stateless filtering operator.
+- [x] Implement one stateless filtering operator.
 - [ ] Implement `distinct` or another small stateful operator.
 - [ ] Ensure state is owned per subscription.
 - [ ] Decide how operator callbacks surface thrown exceptions.

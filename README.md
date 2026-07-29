@@ -111,7 +111,8 @@ and done events reach a listener. It also demonstrates how `Stream#toList`
 represents stream completion as a `Future`. A first `tap` operator observes data
 events without changing the values sent downstream. A stateless `mapValue`
 operator changes each data event's type while preserving errors, completion,
-and the source stream kind.
+and the source stream kind. A stateless `filterValue` operator tests each data
+event and forwards only accepted values.
 
 ## Project Documents
 
@@ -125,6 +126,8 @@ and the source stream kind.
 - `docs/tap.md`: public API and data path of the first stream operator.
 - `docs/map-value.md`: stateless type-changing transformation and its preserved
   lifecycle behavior.
+- `docs/filter-value.md`: stateless predicate-based filtering and event
+  forwarding behavior.
 - `docs/subscription-lifecycle.md`: subscription state changes observed by a
   stream source.
 - `docs/event-delivery-and-stream-kinds.md`: synchronous and asynchronous event
