@@ -109,7 +109,9 @@ The repository contains the initial learning plan, a minimal Dart library
 package, and tests showing when an `async*` stream starts and how data, error,
 and done events reach a listener. It also demonstrates how `Stream#toList`
 represents stream completion as a `Future`. A first `tap` operator observes data
-events without changing the values sent downstream.
+events without changing the values sent downstream. A stateless `mapValue`
+operator changes each data event's type while preserving errors, completion,
+and the source stream kind.
 
 ## Project Documents
 
@@ -121,6 +123,8 @@ events without changing the values sent downstream.
 - `docs/native-stream-lifecycle.md`: first observation of stream creation,
   listening, data delivery, and completion.
 - `docs/tap.md`: public API and data path of the first stream operator.
+- `docs/map-value.md`: stateless type-changing transformation and its preserved
+  lifecycle behavior.
 - `docs/subscription-lifecycle.md`: subscription state changes observed by a
   stream source.
 - `docs/event-delivery-and-stream-kinds.md`: synchronous and asynchronous event
