@@ -133,6 +133,8 @@ remembers the most recently emitted data and removes consecutive duplicates.
   per-subscription state structure.
 - `docs/operator-callback-errors.md`: how thrown operator callbacks become
   non-terminal stream error events.
+- `docs/dart-built-in-comparison.md`: selected behavior comparisons with
+  Dart's standard `map`, `where`, and `distinct` methods.
 - `docs/subscription-lifecycle.md`: subscription state changes observed by a
   stream source.
 - `docs/event-delivery-and-stream-kinds.md`: synchronous and asynchronous event

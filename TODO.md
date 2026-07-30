@@ -142,7 +142,7 @@ Questions to answer:
 - [x] Implement `distinct` or another small stateful operator.
 - [x] Ensure state is owned per subscription.
 - [x] Decide how operator callbacks surface thrown exceptions.
-- [ ] Compare selected behavior with Dart's built-in stream methods.
+- [x] Compare selected behavior with Dart's built-in stream methods.
 - [ ] Compare selected behavior with RxDart.
 
 Questions to answer:
@@ -298,3 +298,7 @@ changes.
   error event, preserve its stack trace, and continue processing later source
   events. A failed `distinctValue` comparison does not update its previous
   value.
+- Compared callback failures with Dart's built-in `map`, `where`, and
+  `distinct`. The learning operators produce the same data/error/done
+  sequences, including retaining the previous value after a failed
+  `distinct` equality check.
