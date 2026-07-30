@@ -143,6 +143,8 @@ without changing the source subscription.
   and completion through a chained transformation.
 - `docs/recover-value.md`: replacing an error with one value while continuing
   the existing source subscription.
+- `docs/recovery-value-vs-stream.md`: the extra subscription ownership,
+  ordering, and completion involved in stream-based recovery.
 - `docs/subscription-lifecycle.md`: subscription state changes observed by a
   stream source.
 - `docs/event-delivery-and-stream-kinds.md`: synchronous and asynchronous event

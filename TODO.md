@@ -157,7 +157,7 @@ Questions to answer:
 
 - [x] Preserve errors and stack traces across transformations.
 - [x] Implement a small error-recovery operator.
-- [ ] Explore replacing an error with a value versus another stream.
+- [x] Explore replacing an error with a value versus another stream.
 - [ ] Explore retry only after resubscription semantics are clear.
 - [ ] Verify completion behavior after recovery.
 - [ ] Test synchronous exceptions and asynchronous error events separately.
@@ -313,3 +313,8 @@ changes.
 - Added `recoverValue`, which consumes each source error and emits one data
   value returned by a recovery callback without resubscribing. If recovery
   throws, that new exception becomes a non-terminal downstream error.
+- Compared value recovery with RxDart's `onErrorResume`. A recovery stream adds
+  another owned subscription: the source can continue concurrently, and
+  downstream completion waits for both the source and active recovery streams.
+  A custom stream-recovery operator is deferred until multi-stream coordination
+  is studied.
