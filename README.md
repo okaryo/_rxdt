@@ -137,6 +137,8 @@ remembers the most recently emitted data and removes consecutive duplicates.
   Dart's standard `map`, `where`, and `distinct` methods.
 - `docs/rxdart-comparison.md`: the matching ordinary behavior and intentional
   callback-failure difference between `tap` and RxDart's `doOnData`.
+- `docs/error-forwarding.md`: error and stack-trace identity, continued data,
+  and completion through a chained transformation.
 - `docs/subscription-lifecycle.md`: subscription state changes observed by a
   stream source.
 - `docs/event-delivery-and-stream-kinds.md`: synchronous and asynchronous event

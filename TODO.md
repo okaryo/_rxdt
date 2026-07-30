@@ -155,7 +155,7 @@ Questions to answer:
 
 ### 6. Error, Completion, And Recovery
 
-- [ ] Preserve errors and stack traces across transformations.
+- [x] Preserve errors and stack traces across transformations.
 - [ ] Implement a small error-recovery operator.
 - [ ] Explore replacing an error with a value versus another stream.
 - [ ] Explore retry only after resubscription semantics are clear.
@@ -306,3 +306,7 @@ changes.
   data, but callback failures differ: `tap` replaces the triggering data with
   an error, while `doOnData` emits the callback error and still forwards the
   original data.
+- Verified that a source error and its stack trace retain their identities
+  through a chain of `tap`, `mapValue`, `filterValue`, and `distinctValue`.
+  Data processing can continue after the error, and done is forwarded once
+  only when the source closes.
