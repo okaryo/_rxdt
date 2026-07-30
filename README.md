@@ -113,7 +113,9 @@ events without changing the values sent downstream. A stateless `mapValue`
 operator changes each data event's type while preserving errors, completion,
 and the source stream kind. A stateless `filterValue` operator tests each data
 event and forwards only accepted values. A stateful `distinctValue` operator
-remembers the most recently emitted data and removes consecutive duplicates.
+remembers the most recently emitted data and removes consecutive duplicates. A
+`recoverValue` operator handles each error by replacing it with one data value
+without changing the source subscription.
 
 ## Project Documents
 
@@ -139,6 +141,8 @@ remembers the most recently emitted data and removes consecutive duplicates.
   callback-failure difference between `tap` and RxDart's `doOnData`.
 - `docs/error-forwarding.md`: error and stack-trace identity, continued data,
   and completion through a chained transformation.
+- `docs/recover-value.md`: replacing an error with one value while continuing
+  the existing source subscription.
 - `docs/subscription-lifecycle.md`: subscription state changes observed by a
   stream source.
 - `docs/event-delivery-and-stream-kinds.md`: synchronous and asynchronous event

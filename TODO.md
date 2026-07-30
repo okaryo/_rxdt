@@ -156,7 +156,7 @@ Questions to answer:
 ### 6. Error, Completion, And Recovery
 
 - [x] Preserve errors and stack traces across transformations.
-- [ ] Implement a small error-recovery operator.
+- [x] Implement a small error-recovery operator.
 - [ ] Explore replacing an error with a value versus another stream.
 - [ ] Explore retry only after resubscription semantics are clear.
 - [ ] Verify completion behavior after recovery.
@@ -310,3 +310,6 @@ changes.
   through a chain of `tap`, `mapValue`, `filterValue`, and `distinctValue`.
   Data processing can continue after the error, and done is forwarded once
   only when the source closes.
+- Added `recoverValue`, which consumes each source error and emits one data
+  value returned by a recovery callback without resubscribing. If recovery
+  throws, that new exception becomes a non-terminal downstream error.
