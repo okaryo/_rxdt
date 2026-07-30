@@ -16,7 +16,13 @@ final class _TapStreamTransformer<T> extends StreamTransformerBase<T, T> {
     return stream.transform(
       StreamTransformer<T, T>.fromHandlers(
         handleData: (event, sink) {
-          _onData(event);
+          try {
+            _onData(event);
+          } catch (error, stackTrace) {
+            sink.addError(error, stackTrace);
+            return;
+          }
+
           sink.add(event);
         },
       ),

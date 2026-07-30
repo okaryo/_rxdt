@@ -17,7 +17,16 @@ final class _FilterValueStreamTransformer<T>
     return stream.transform(
       StreamTransformer<T, T>.fromHandlers(
         handleData: (event, sink) {
-          if (_test(event)) {
+          bool accepted;
+
+          try {
+            accepted = _test(event);
+          } catch (error, stackTrace) {
+            sink.addError(error, stackTrace);
+            return;
+          }
+
+          if (accepted) {
             sink.add(event);
           }
         },

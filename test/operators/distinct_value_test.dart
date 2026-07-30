@@ -51,6 +51,55 @@ void main() {
     expect(downstreamStackTrace, same(expectedStackTrace));
   });
 
+  test(
+    'distinctValue keeps its previous value when equality checking fails',
+    () async {
+      final expectedError = StateError('equality failed');
+      final comparisons = <String>[];
+      final downstreamEvents = <String>[];
+      final done = Completer<void>();
+      final controller = StreamController<int>();
+      Object? downstreamError;
+      StackTrace? downstreamStackTrace;
+      var shouldThrow = true;
+
+      controller.stream
+          .distinctValue((previous, next) {
+            comparisons.add('$previous:$next');
+
+            if (next == 2 && shouldThrow) {
+              shouldThrow = false;
+              throw expectedError;
+            }
+
+            return previous == next;
+          })
+          .listen(
+            (value) => downstreamEvents.add('data:$value'),
+            onError: (Object error, StackTrace stackTrace) {
+              downstreamError = error;
+              downstreamStackTrace = stackTrace;
+              downstreamEvents.add('error');
+            },
+            onDone: () {
+              downstreamEvents.add('done');
+              done.complete();
+            },
+          );
+
+      controller.add(1);
+      controller.add(2);
+      controller.add(2);
+      await controller.close();
+      await done.future;
+
+      expect(comparisons, ['1:2', '1:2']);
+      expect(downstreamEvents, ['data:1', 'error', 'data:2', 'done']);
+      expect(downstreamError, same(expectedError));
+      expect(downstreamStackTrace, isNotNull);
+    },
+  );
+
   test('distinctValue preserves the source stream kind', () {
     final single = Stream.fromIterable([1]).distinctValue();
     final broadcast = const Stream<int>.empty(broadcast: true).distinctValue();

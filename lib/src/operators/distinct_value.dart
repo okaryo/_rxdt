@@ -32,9 +32,19 @@ final class _DistinctValueEventSink<T> implements EventSink<T> {
 
   @override
   void add(T event) {
-    if (_hasPrevious &&
-        (_equals?.call(_previous, event) ?? _previous == event)) {
-      return;
+    if (_hasPrevious) {
+      bool isEqual;
+
+      try {
+        isEqual = _equals?.call(_previous, event) ?? _previous == event;
+      } catch (error, stackTrace) {
+        _outputSink.addError(error, stackTrace);
+        return;
+      }
+
+      if (isEqual) {
+        return;
+      }
     }
 
     _previous = event;

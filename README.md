@@ -131,6 +131,8 @@ remembers the most recently emitted data and removes consecutive duplicates.
   forwarding behavior.
 - `docs/distinct-value.md`: consecutive duplicate suppression and
   per-subscription state structure.
+- `docs/operator-callback-errors.md`: how thrown operator callbacks become
+  non-terminal stream error events.
 - `docs/subscription-lifecycle.md`: subscription state changes observed by a
   stream source.
 - `docs/event-delivery-and-stream-kinds.md`: synchronous and asynchronous event

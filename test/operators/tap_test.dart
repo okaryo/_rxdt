@@ -57,6 +57,48 @@ void main() {
     expect(doneCount, 1);
   });
 
+  test('tap replaces a callback failure with an error and continues', () async {
+    final expectedError = StateError('tap failed');
+    final observed = <int>[];
+    final downstreamEvents = <String>[];
+    final done = Completer<void>();
+    final controller = StreamController<int>();
+    Object? downstreamError;
+    StackTrace? downstreamStackTrace;
+
+    controller.stream
+        .tap((value) {
+          if (value == 2) {
+            throw expectedError;
+          }
+
+          observed.add(value);
+        })
+        .listen(
+          (value) => downstreamEvents.add('data:$value'),
+          onError: (Object error, StackTrace stackTrace) {
+            downstreamError = error;
+            downstreamStackTrace = stackTrace;
+            downstreamEvents.add('error');
+          },
+          onDone: () {
+            downstreamEvents.add('done');
+            done.complete();
+          },
+        );
+
+    controller.add(1);
+    controller.add(2);
+    controller.add(3);
+    await controller.close();
+    await done.future;
+
+    expect(observed, [1, 3]);
+    expect(downstreamEvents, ['data:1', 'error', 'data:3', 'done']);
+    expect(downstreamError, same(expectedError));
+    expect(downstreamStackTrace, isNotNull);
+  });
+
   test('tap does not listen to its source until downstream listens', () async {
     var sourceListenCount = 0;
     late final StreamController<int> controller;

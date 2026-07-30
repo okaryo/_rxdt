@@ -141,7 +141,7 @@ Questions to answer:
 - [x] Implement one stateless filtering operator.
 - [x] Implement `distinct` or another small stateful operator.
 - [x] Ensure state is owned per subscription.
-- [ ] Decide how operator callbacks surface thrown exceptions.
+- [x] Decide how operator callbacks surface thrown exceptions.
 - [ ] Compare selected behavior with Dart's built-in stream methods.
 - [ ] Compare selected behavior with RxDart.
 
@@ -293,3 +293,8 @@ changes.
   that its returned future waits for asynchronous source cleanup.
 - Verified that after downstream cancellation, later source events reach
   neither the `tap` callback nor the downstream listener.
+- Chose a common callback-failure contract for `tap`, `mapValue`,
+  `filterValue`, and `distinctValue`: replace the triggering data event with an
+  error event, preserve its stack trace, and continue processing later source
+  events. A failed `distinctValue` comparison does not update its previous
+  value.

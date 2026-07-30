@@ -17,7 +17,16 @@ final class _MapValueStreamTransformer<T, R>
     return stream.transform(
       StreamTransformer<T, R>.fromHandlers(
         handleData: (event, sink) {
-          sink.add(_convert(event));
+          R converted;
+
+          try {
+            converted = _convert(event);
+          } catch (error, stackTrace) {
+            sink.addError(error, stackTrace);
+            return;
+          }
+
+          sink.add(converted);
         },
       ),
     );

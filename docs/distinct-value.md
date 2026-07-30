@@ -101,4 +101,8 @@ Both histories become `[1, 2]`, but they arrive there through different
 decisions. If the previous value were shared, the second listener's first `1`
 would incorrectly be suppressed.
 
-Custom equality and equality-callback failures remain later learning steps.
+If custom equality throws, the triggering data event is replaced by an error
+event. The event is not emitted and does not replace the remembered previous
+value. Later events are therefore compared with the last value that was
+successfully emitted. The common callback-failure contract is described in
+`operator-callback-errors.md`.

@@ -147,5 +147,7 @@ Ordinary one-to-one transformation and filtering operators should preserve the
 source kind unless their documented purpose is to change subscription sharing,
 such as a future multicast or subject operator.
 
-Callback failures still need a separate test before that behavior is considered
-understood.
+If the tap callback throws, the triggering data event is replaced by an error
+event. It is not forwarded as data, and later source events can still be
+processed. The shared callback-failure contract is described in
+`operator-callback-errors.md`.

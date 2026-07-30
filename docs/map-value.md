@@ -37,7 +37,16 @@ other event history. It is therefore stateless.
 
 ```dart
 handleData: (event, sink) {
-  sink.add(convert(event));
+  R converted;
+
+  try {
+    converted = convert(event);
+  } catch (error, stackTrace) {
+    sink.addError(error, stackTrace);
+    return;
+  }
+
+  sink.add(converted);
 }
 ```
 
@@ -55,6 +64,8 @@ broadcast source           -> broadcast result
 For a broadcast source, conversion runs independently for each downstream
 subscription. The operator does not introduce sharing.
 
-The behavior of an exception thrown by `convert` is intentionally left for the
-focused callback-failure step. A later comparison will also show how this
-learning implementation relates to Dart's built-in `Stream.map`.
+If `convert` throws, the triggering data event is replaced by an error event
+with the callback's stack trace. Later source events can still be converted.
+The common contract is described in `operator-callback-errors.md`. A later
+comparison will show how this learning implementation relates to Dart's
+built-in `Stream.map`.

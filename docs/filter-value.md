@@ -45,6 +45,8 @@ source's single-subscription or broadcast kind.
 For a broadcast source, the predicate runs once per downstream subscription,
 just like the callback in `tap` and the conversion in `mapValue`.
 
-An exception thrown by the predicate is deferred to the focused
-callback-failure step. A later comparison will relate this learning operator to
-Dart's built-in `Stream.where`.
+If the predicate throws, the triggering data event is replaced by an error
+event with the callback's stack trace. Later source events are still tested.
+The common contract is described in `operator-callback-errors.md`. A later
+comparison will relate this learning operator to Dart's built-in
+`Stream.where`.
