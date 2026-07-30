@@ -143,7 +143,7 @@ Questions to answer:
 - [x] Ensure state is owned per subscription.
 - [x] Decide how operator callbacks surface thrown exceptions.
 - [x] Compare selected behavior with Dart's built-in stream methods.
-- [ ] Compare selected behavior with RxDart.
+- [x] Compare selected behavior with RxDart.
 
 Questions to answer:
 
@@ -302,3 +302,7 @@ changes.
   `distinct`. The learning operators produce the same data/error/done
   sequences, including retaining the previous value after a failed
   `distinct` equality check.
+- Compared `tap` with RxDart's `doOnData`. Both observe and preserve ordinary
+  data, but callback failures differ: `tap` replaces the triggering data with
+  an error, while `doOnData` emits the callback error and still forwards the
+  original data.

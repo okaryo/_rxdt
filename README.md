@@ -135,6 +135,8 @@ remembers the most recently emitted data and removes consecutive duplicates.
   non-terminal stream error events.
 - `docs/dart-built-in-comparison.md`: selected behavior comparisons with
   Dart's standard `map`, `where`, and `distinct` methods.
+- `docs/rxdart-comparison.md`: the matching ordinary behavior and intentional
+  callback-failure difference between `tap` and RxDart's `doOnData`.
 - `docs/subscription-lifecycle.md`: subscription state changes observed by a
   stream source.
 - `docs/event-delivery-and-stream-kinds.md`: synchronous and asynchronous event
