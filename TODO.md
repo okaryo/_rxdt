@@ -159,7 +159,7 @@ Questions to answer:
 - [x] Implement a small error-recovery operator.
 - [x] Explore replacing an error with a value versus another stream.
 - [x] Explore retry only after resubscription semantics are clear.
-- [ ] Verify completion behavior after recovery.
+- [x] Verify completion behavior after recovery.
 - [ ] Test synchronous exceptions and asynchronous error events separately.
 
 Questions to answer:
@@ -322,3 +322,7 @@ changes.
   than continuation after an error. Data from failed attempts remains visible;
   successful retry suppresses earlier errors, while exhausted retry emits all
   collected errors and their stack traces.
+- Verified recovery completion boundaries: `recoverValue` stays open across
+  multiple recovered errors and closes once with its source; stream recovery
+  waits for active recovery subscriptions; retry closes after success or after
+  exhausting attempts and delivering its collected errors.

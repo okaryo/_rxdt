@@ -78,6 +78,53 @@ void main() {
     },
   );
 
+  test(
+    'recoverValue stays open across recoveries and forwards source done once',
+    () async {
+      final downstreamEvents = <String>[];
+      final recoveredTwice = Completer<void>();
+      final done = Completer<void>();
+      final controller = StreamController<int>();
+      var recoveryCount = 0;
+      var doneCount = 0;
+
+      controller.stream
+          .recoverValue((_, _) {
+            recoveryCount++;
+            return -recoveryCount;
+          })
+          .listen(
+            (value) {
+              downstreamEvents.add('data:$value');
+
+              if (value == -2) {
+                recoveredTwice.complete();
+              }
+            },
+            onError: (Object _) => downstreamEvents.add('error'),
+            onDone: () {
+              doneCount++;
+              downstreamEvents.add('done');
+              done.complete();
+            },
+          );
+
+      controller.addError(StateError('first'), StackTrace.current);
+      controller.addError(StateError('second'), StackTrace.current);
+      await recoveredTwice.future;
+
+      expect(recoveryCount, 2);
+      expect(downstreamEvents, ['data:-1', 'data:-2']);
+      expect(done.isCompleted, isFalse);
+
+      await controller.close();
+      await done.future;
+
+      expect(downstreamEvents, ['data:-1', 'data:-2', 'done']);
+      expect(doneCount, 1);
+    },
+  );
+
   test('recoverValue preserves the source stream kind', () {
     final single = Stream.fromIterable([1]).recoverValue((_, _) => -1);
     final broadcast = const Stream<int>.empty(

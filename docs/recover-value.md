@@ -74,6 +74,22 @@ The original error was handled, so it is not emitted in addition to the
 recovery error. The recovery error uses the stack trace captured where the
 callback threw.
 
+## Completion After Recovery
+
+Recovery and completion are separate events. `recoverValue` does not close its
+output after producing a fallback value. Every source error can be recovered
+independently, and the existing source subscription remains active:
+
+```text
+source error 1 -> replacement data 1
+source error 2 -> replacement data 2
+source done    -> downstream done
+```
+
+Only source done closes the transformed stream, and it is forwarded exactly
+once. A recovery callback failure is also just an error event; it does not
+close the stream by itself.
+
 ## Preserved Behavior
 
 Data and done events bypass the recovery callback and are forwarded normally.
