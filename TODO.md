@@ -160,7 +160,7 @@ Questions to answer:
 - [x] Explore replacing an error with a value versus another stream.
 - [x] Explore retry only after resubscription semantics are clear.
 - [x] Verify completion behavior after recovery.
-- [ ] Test synchronous exceptions and asynchronous error events separately.
+- [x] Test synchronous exceptions and asynchronous error events separately.
 
 Questions to answer:
 
@@ -326,3 +326,7 @@ changes.
   multiple recovered errors and closes once with its source; stream recovery
   waits for active recovery subscriptions; retry closes after success or after
   exhausting attempts and delivering its collected errors.
+- Confirmed the recovery boundary: an asynchronously delivered error event
+  reaches `recoverValue` with its error and stack trace, while a synchronous
+  exception thrown before source creation must be caught by the caller because
+  no stream or subscription exists yet.

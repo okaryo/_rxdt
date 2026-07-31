@@ -149,6 +149,8 @@ without changing the source subscription.
   data, attempt limits, and final error delivery.
 - `docs/recovery-completion.md`: which owned subscription determines done for
   value recovery, stream recovery, and retry.
+- `docs/recovery-error-boundary.md`: why stream error events are recoverable but
+  exceptions thrown before stream creation are not.
 - `docs/subscription-lifecycle.md`: subscription state changes observed by a
   stream source.
 - `docs/event-delivery-and-stream-kinds.md`: synchronous and asynchronous event
