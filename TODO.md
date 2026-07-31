@@ -158,7 +158,7 @@ Questions to answer:
 - [x] Preserve errors and stack traces across transformations.
 - [x] Implement a small error-recovery operator.
 - [x] Explore replacing an error with a value versus another stream.
-- [ ] Explore retry only after resubscription semantics are clear.
+- [x] Explore retry only after resubscription semantics are clear.
 - [ ] Verify completion behavior after recovery.
 - [ ] Test synchronous exceptions and asynchronous error events separately.
 
@@ -318,3 +318,7 @@ changes.
   downstream completion waits for both the source and active recovery streams.
   A custom stream-recovery operator is deferred until multi-stream coordination
   is studied.
+- Observed RxDart retry as repeated source creation and subscription rather
+  than continuation after an error. Data from failed attempts remains visible;
+  successful retry suppresses earlier errors, while exhausted retry emits all
+  collected errors and their stack traces.

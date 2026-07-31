@@ -145,6 +145,8 @@ without changing the source subscription.
   the existing source subscription.
 - `docs/recovery-value-vs-stream.md`: the extra subscription ownership,
   ordering, and completion involved in stream-based recovery.
+- `docs/retry-and-resubscription.md`: retry as fresh source creation, repeated
+  data, attempt limits, and final error delivery.
 - `docs/subscription-lifecycle.md`: subscription state changes observed by a
   stream source.
 - `docs/event-delivery-and-stream-kinds.md`: synchronous and asynchronous event
