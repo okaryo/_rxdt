@@ -115,7 +115,8 @@ and the source stream kind. A stateless `filterValue` operator tests each data
 event and forwards only accepted values. A stateful `distinctValue` operator
 remembers the most recently emitted data and removes consecutive duplicates. A
 `recoverValue` operator handles each error by replacing it with one data value
-without changing the source subscription.
+without changing the source subscription. An initial `concatWith` operator
+subscribes to two streams sequentially, handing off only after the first done.
 
 ## Project Documents
 
@@ -151,6 +152,8 @@ without changing the source subscription.
   value recovery, stream recovery, and retry.
 - `docs/recovery-error-boundary.md`: why stream error events are recoverable but
   exceptions thrown before stream creation are not.
+- `docs/concat-with.md`: sequential subscription, error forwarding, handoff,
+  completion, and the initial single-subscription result.
 - `docs/subscription-lifecycle.md`: subscription state changes observed by a
   stream source.
 - `docs/event-delivery-and-stream-kinds.md`: synchronous and asynchronous event

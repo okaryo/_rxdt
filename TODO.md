@@ -171,7 +171,7 @@ Questions to answer:
 
 ### 7. Combining Streams
 
-- [ ] Implement concatenation for two streams.
+- [x] Implement concatenation for two streams.
 - [ ] Implement merging for two streams.
 - [ ] Coordinate errors, completion, pause, and cancellation across sources.
 - [ ] Explore switch-to-latest behavior.
@@ -330,3 +330,7 @@ changes.
   reaches `recoverValue` with its error and stack trace, while a synchronous
   exception thrown before source creation must be caught by the caller because
   no stream or subscription exists yet.
+- Added an initial `concatWith` using `async*` and `yield*`. It lazily owns one
+  upstream subscription at a time, hands off from first to second only on done,
+  forwards non-terminal errors, and currently returns a single-subscription
+  stream even for broadcast inputs.
