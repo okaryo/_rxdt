@@ -117,6 +117,8 @@ remembers the most recently emitted data and removes consecutive duplicates. A
 `recoverValue` operator handles each error by replacing it with one data value
 without changing the source subscription. An initial `concatWith` operator
 subscribes to two streams sequentially, handing off only after the first done.
+An initial `mergeWith` operator subscribes to two streams concurrently and
+closes after both complete.
 
 ## Project Documents
 
@@ -154,6 +156,8 @@ subscribes to two streams sequentially, handing off only after the first done.
   exceptions thrown before stream creation are not.
 - `docs/concat-with.md`: sequential subscription, error forwarding, handoff,
   completion, and the initial single-subscription result.
+- `docs/merge-with.md`: concurrent subscriptions, interleaving, completion,
+  and ownership of both upstream subscriptions.
 - `docs/subscription-lifecycle.md`: subscription state changes observed by a
   stream source.
 - `docs/event-delivery-and-stream-kinds.md`: synchronous and asynchronous event

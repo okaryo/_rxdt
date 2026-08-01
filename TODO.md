@@ -172,7 +172,7 @@ Questions to answer:
 ### 7. Combining Streams
 
 - [x] Implement concatenation for two streams.
-- [ ] Implement merging for two streams.
+- [x] Implement merging for two streams.
 - [ ] Coordinate errors, completion, pause, and cancellation across sources.
 - [ ] Explore switch-to-latest behavior.
 - [ ] Explore combine-latest behavior.
@@ -334,3 +334,7 @@ changes.
   upstream subscription at a time, hands off from first to second only on done,
   forwards non-terminal errors, and currently returns a single-subscription
   stream even for broadcast inputs.
+- Added `mergeWith` with two concurrent upstream subscriptions. It forwards
+  each source's events in observed arrival order, preserves errors and stack
+  traces, and closes only after both sources complete. Multi-source pause,
+  cancellation, and cleanup are wired and remain to be tested directly.
