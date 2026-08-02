@@ -124,6 +124,112 @@ void main() {
     },
   );
 
+  test('mergeWith pauses and resumes both source subscriptions', () async {
+    final firstPaused = Completer<void>();
+    final secondPaused = Completer<void>();
+    final firstResumed = Completer<void>();
+    final secondResumed = Completer<void>();
+    final receivedBoth = Completer<void>();
+    final done = Completer<void>();
+    final downstreamData = <int>[];
+    final first = StreamController<int>(
+      onPause: firstPaused.complete,
+      onResume: firstResumed.complete,
+    );
+    final second = StreamController<int>(
+      onPause: secondPaused.complete,
+      onResume: secondResumed.complete,
+    );
+    final subscription = first.stream.mergeWith(second.stream).listen((value) {
+      downstreamData.add(value);
+
+      if (downstreamData.length == 2) {
+        receivedBoth.complete();
+      }
+    }, onDone: done.complete);
+
+    subscription.pause();
+    await Future.wait([firstPaused.future, secondPaused.future]);
+
+    expect(first.isPaused, isTrue);
+    expect(second.isPaused, isTrue);
+
+    first.add(1);
+    second.add(2);
+    await Future<void>.delayed(Duration.zero);
+
+    expect(downstreamData, isEmpty);
+
+    subscription.resume();
+    await Future.wait([firstResumed.future, secondResumed.future]);
+    await receivedBoth.future;
+
+    expect(first.isPaused, isFalse);
+    expect(second.isPaused, isFalse);
+    expect(downstreamData, unorderedEquals([1, 2]));
+
+    await first.close();
+    await second.close();
+    await done.future;
+  });
+
+  test('mergeWith cancellation waits for both source cleanups', () async {
+    final firstListened = Completer<void>();
+    final secondListened = Completer<void>();
+    final firstCancelStarted = Completer<void>();
+    final secondCancelStarted = Completer<void>();
+    final allowFirstCleanup = Completer<void>();
+    final allowSecondCleanup = Completer<void>();
+    final firstCleanupFinished = Completer<void>();
+    final downstreamData = <int>[];
+    final first = StreamController<int>(
+      onListen: firstListened.complete,
+      onCancel: () async {
+        firstCancelStarted.complete();
+        await allowFirstCleanup.future;
+        firstCleanupFinished.complete();
+      },
+    );
+    final second = StreamController<int>(
+      onListen: secondListened.complete,
+      onCancel: () async {
+        secondCancelStarted.complete();
+        await allowSecondCleanup.future;
+      },
+    );
+    final subscription = first.stream
+        .mergeWith(second.stream)
+        .listen(downstreamData.add);
+    var downstreamCancelCompleted = false;
+
+    await Future.wait([firstListened.future, secondListened.future]);
+
+    final downstreamCancel = subscription.cancel().then((_) {
+      downstreamCancelCompleted = true;
+    });
+
+    await Future.wait([firstCancelStarted.future, secondCancelStarted.future]);
+
+    expect(downstreamCancelCompleted, isFalse);
+
+    allowFirstCleanup.complete();
+    await firstCleanupFinished.future;
+
+    expect(downstreamCancelCompleted, isFalse);
+
+    allowSecondCleanup.complete();
+    await downstreamCancel;
+
+    expect(downstreamCancelCompleted, isTrue);
+
+    first.add(1);
+    second.add(2);
+    await first.close();
+    await second.close();
+
+    expect(downstreamData, isEmpty);
+  });
+
   test('mergeWith currently returns a single-subscription stream', () {
     final first = const Stream<int>.empty(broadcast: true);
     final second = const Stream<int>.empty(broadcast: true);

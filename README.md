@@ -158,6 +158,8 @@ closes after both complete.
   completion, and the initial single-subscription result.
 - `docs/merge-with.md`: concurrent subscriptions, interleaving, completion,
   and ownership of both upstream subscriptions.
+- `docs/multi-source-lifecycle.md`: pause, resume, cancellation, asynchronous
+  cleanup, errors, and done across sequential and concurrent sources.
 - `docs/subscription-lifecycle.md`: subscription state changes observed by a
   stream source.
 - `docs/event-delivery-and-stream-kinds.md`: synchronous and asynchronous event

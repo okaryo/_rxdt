@@ -98,6 +98,55 @@ void main() {
     },
   );
 
+  test(
+    'concatWith cancellation cleans up first and never listens to second',
+    () async {
+      final firstListened = Completer<void>();
+      final firstCancelStarted = Completer<void>();
+      final allowFirstCleanup = Completer<void>();
+      final first = StreamController<int>(
+        onListen: firstListened.complete,
+        onCancel: () async {
+          firstCancelStarted.complete();
+          await allowFirstCleanup.future;
+        },
+      );
+      var secondListenCount = 0;
+      final second = StreamController<int>.broadcast(
+        onListen: () => secondListenCount++,
+      );
+      final downstreamEvents = <String>[];
+      final subscription = first.stream
+          .concatWith(second.stream)
+          .listen(
+            (value) => downstreamEvents.add('data:$value'),
+            onDone: () => downstreamEvents.add('done'),
+          );
+      var downstreamCancelCompleted = false;
+
+      await firstListened.future;
+
+      final downstreamCancel = subscription.cancel().then((_) {
+        downstreamCancelCompleted = true;
+      });
+
+      await firstCancelStarted.future;
+
+      expect(secondListenCount, 0);
+      expect(downstreamCancelCompleted, isFalse);
+
+      allowFirstCleanup.complete();
+      await downstreamCancel;
+
+      expect(secondListenCount, 0);
+      expect(downstreamCancelCompleted, isTrue);
+      expect(downstreamEvents, isEmpty);
+
+      await first.close();
+      await second.close();
+    },
+  );
+
   test('concatWith currently returns a single-subscription stream', () {
     final first = const Stream<int>.empty(broadcast: true);
     final second = const Stream<int>.empty(broadcast: true);

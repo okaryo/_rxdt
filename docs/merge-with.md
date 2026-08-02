@@ -64,8 +64,10 @@ second done -> output done
 
 The output `StreamController` owns two upstream subscriptions at the same time.
 Its current wiring pauses, resumes, and cancels both subscriptions together.
-The next learning step adds focused tests for those lifecycle paths and their
-asynchronous cleanup behavior.
+Focused lifecycle tests verify that pause and resume reach both sources and
+that downstream cancellation waits for both asynchronous cleanup futures. See
+`multi-source-lifecycle.md` for the complete ownership comparison with
+`concatWith`.
 
 The initial controller is single-subscription, so `mergeWith` currently returns
 a single-subscription stream even when both inputs are broadcast. Broadcast

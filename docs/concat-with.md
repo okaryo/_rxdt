@@ -58,8 +58,9 @@ first done   -> now subscribe to second
 
 The handoff is controlled by done, not error. A downstream listener using
 `cancelOnError: true` may cancel the concatenated subscription instead; that
-cancellation behavior will be tested with the other multi-stream lifecycle
-rules in a later step.
+cancellation cleans up the currently active source and does not subscribe to
+the next source. See `multi-source-lifecycle.md` for the ownership comparison
+with `mergeWith`.
 
 ## Completion
 

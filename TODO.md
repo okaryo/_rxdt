@@ -173,7 +173,7 @@ Questions to answer:
 
 - [x] Implement concatenation for two streams.
 - [x] Implement merging for two streams.
-- [ ] Coordinate errors, completion, pause, and cancellation across sources.
+- [x] Coordinate errors, completion, pause, and cancellation across sources.
 - [ ] Explore switch-to-latest behavior.
 - [ ] Explore combine-latest behavior.
 - [ ] Add deterministic tests for interleaved event sequences.
@@ -338,3 +338,7 @@ changes.
   each source's events in observed arrival order, preserves errors and stack
   traces, and closes only after both sources complete. Multi-source pause,
   cancellation, and cleanup are wired and remain to be tested directly.
+- Verified multi-source lifecycle ownership. `mergeWith` pauses and resumes
+  both sources and waits for both asynchronous cancellation cleanups;
+  `concatWith` cancels only its active first source and never subscribes to the
+  second after downstream cancellation.
