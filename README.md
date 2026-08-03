@@ -118,7 +118,8 @@ remembers the most recently emitted data and removes consecutive duplicates. A
 without changing the source subscription. An initial `concatWith` operator
 subscribes to two streams sequentially, handing off only after the first done.
 An initial `mergeWith` operator subscribes to two streams concurrently and
-closes after both complete.
+closes after both complete. A `switchLatest` operator keeps only the newest
+inner subscription from a higher-order stream.
 
 ## Project Documents
 
@@ -160,6 +161,8 @@ closes after both complete.
   and ownership of both upstream subscriptions.
 - `docs/multi-source-lifecycle.md`: pause, resume, cancellation, asynchronous
   cleanup, errors, and done across sequential and concurrent sources.
+- `docs/switch-latest.md`: higher-order streams, inner replacement, stale-event
+  suppression, cleanup, and completion.
 - `docs/subscription-lifecycle.md`: subscription state changes observed by a
   stream source.
 - `docs/event-delivery-and-stream-kinds.md`: synchronous and asynchronous event

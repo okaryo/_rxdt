@@ -174,7 +174,7 @@ Questions to answer:
 - [x] Implement concatenation for two streams.
 - [x] Implement merging for two streams.
 - [x] Coordinate errors, completion, pause, and cancellation across sources.
-- [ ] Explore switch-to-latest behavior.
+- [x] Explore switch-to-latest behavior.
 - [ ] Explore combine-latest behavior.
 - [ ] Add deterministic tests for interleaved event sequences.
 
@@ -342,3 +342,6 @@ changes.
   both sources and waits for both asynchronous cancellation cleanups;
   `concatWith` cancels only its active first source and never subscribes to the
   second after downstream cancellation.
+- Added `switchLatest` for a higher-order stream. A new inner marks the previous
+  generation stale, waits for its cancellation cleanup, and then becomes the
+  sole inner source. Output waits for both outer done and latest-inner done.
