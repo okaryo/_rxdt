@@ -30,6 +30,10 @@ The implementation uses `hasFirst` and `hasSecond` flags in addition to
 `late` latest-value fields. A null check would be incorrect because `A` or `B`
 may itself be nullable and `null` can be a valid latest value.
 
+The exact combined sequence depends on the cross-source delivery order. See
+`deterministic-interleaving.md` for a focused test that controls one schedule
+and contrasts this operator with `mergeWith`.
+
 ## Completion
 
 The output closes after both sources complete. A completed source's latest

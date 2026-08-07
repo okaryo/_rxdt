@@ -48,6 +48,9 @@ first 1 -> second 10 -> first 2 -> second 20
 Real concurrent producers may produce any interleaving consistent with each
 source's local order.
 
+See `deterministic-interleaving.md` for two ways to control cross-source order
+in tests without treating one arbitrary asynchronous schedule as guaranteed.
+
 ## Error And Completion
 
 An error from either source is forwarded with its stack trace and does not

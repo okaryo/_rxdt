@@ -141,6 +141,8 @@ after both sources have emitted.
   per-subscription state structure.
 - `docs/combine-latest-with.md`: two-source readiness state, latest-value
   retention, errors, and completion.
+- `docs/deterministic-interleaving.md`: controlled cross-source schedules and
+  reliable ordering tests for multi-source operators.
 - `docs/operator-callback-errors.md`: how thrown operator callbacks become
   non-terminal stream error events.
 - `docs/dart-built-in-comparison.md`: selected behavior comparisons with

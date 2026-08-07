@@ -176,7 +176,7 @@ Questions to answer:
 - [x] Coordinate errors, completion, pause, and cancellation across sources.
 - [x] Explore switch-to-latest behavior.
 - [x] Explore combine-latest behavior.
-- [ ] Add deterministic tests for interleaved event sequences.
+- [x] Add deterministic tests for interleaved event sequences.
 
 Questions to answer:
 
@@ -348,3 +348,7 @@ changes.
 - Added `combineLatestWith` for two sources. It tracks readiness separately
   from nullable values, retains a completed source's latest value, converts
   combiner failures to non-terminal errors, and closes after both sources.
+- Compared `mergeWith` and `combineLatestWith` under the same controlled
+  cross-source schedule. Synchronous test controllers make each `add` the
+  delivery boundary; asynchronous tests can instead await listener-side
+  acknowledgements between events.
