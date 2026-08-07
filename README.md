@@ -119,7 +119,9 @@ without changing the source subscription. An initial `concatWith` operator
 subscribes to two streams sequentially, handing off only after the first done.
 An initial `mergeWith` operator subscribes to two streams concurrently and
 closes after both complete. A `switchLatest` operator keeps only the newest
-inner subscription from a higher-order stream.
+inner subscription from a higher-order stream. A `combineLatestWith` operator
+stores the latest value from each of two sources and starts combining only
+after both sources have emitted.
 
 ## Project Documents
 
@@ -137,6 +139,8 @@ inner subscription from a higher-order stream.
   forwarding behavior.
 - `docs/distinct-value.md`: consecutive duplicate suppression and
   per-subscription state structure.
+- `docs/combine-latest-with.md`: two-source readiness state, latest-value
+  retention, errors, and completion.
 - `docs/operator-callback-errors.md`: how thrown operator callbacks become
   non-terminal stream error events.
 - `docs/dart-built-in-comparison.md`: selected behavior comparisons with

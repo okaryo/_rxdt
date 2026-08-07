@@ -175,7 +175,7 @@ Questions to answer:
 - [x] Implement merging for two streams.
 - [x] Coordinate errors, completion, pause, and cancellation across sources.
 - [x] Explore switch-to-latest behavior.
-- [ ] Explore combine-latest behavior.
+- [x] Explore combine-latest behavior.
 - [ ] Add deterministic tests for interleaved event sequences.
 
 Questions to answer:
@@ -345,3 +345,6 @@ changes.
 - Added `switchLatest` for a higher-order stream. A new inner marks the previous
   generation stale, waits for its cancellation cleanup, and then becomes the
   sole inner source. Output waits for both outer done and latest-inner done.
+- Added `combineLatestWith` for two sources. It tracks readiness separately
+  from nullable values, retains a completed source's latest value, converts
+  combiner failures to non-terminal errors, and closes after both sources.
