@@ -187,7 +187,7 @@ Questions to answer:
 
 ### 8. Time-Based Operators
 
-- [ ] Implement delay using `Timer`.
+- [x] Implement delay using `Timer`.
 - [ ] Explore debounce and throttle semantics.
 - [ ] Define what happens to pending timers on pause or cancellation.
 - [ ] Test ordering when data, errors, completion, and timers race.
@@ -352,3 +352,7 @@ changes.
   cross-source schedule. Synchronous test controllers make each `add` the
   delivery boundary; asynchronous tests can instead await listener-side
   acknowledgements between events.
+- Added `delayValue` using one owned `Timer` per data event. Source completion
+  is remembered while timers remain, and output closes only after the final
+  delayed value has been added. Focused pause, cancellation, and error-race
+  tests remain next.

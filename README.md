@@ -121,7 +121,8 @@ An initial `mergeWith` operator subscribes to two streams concurrently and
 closes after both complete. A `switchLatest` operator keeps only the newest
 inner subscription from a higher-order stream. A `combineLatestWith` operator
 stores the latest value from each of two sources and starts combining only
-after both sources have emitted.
+after both sources have emitted. A first time-based `delayValue` operator owns
+one `Timer` per pending data event and postpones completion until they fire.
 
 ## Project Documents
 
@@ -143,6 +144,8 @@ after both sources have emitted.
   retention, errors, and completion.
 - `docs/deterministic-interleaving.md`: controlled cross-source schedules and
   reliable ordering tests for multi-source operators.
+- `docs/delay-value.md`: timer ownership, delayed data, and the completion
+  boundary while timers remain pending.
 - `docs/operator-callback-errors.md`: how thrown operator callbacks become
   non-terminal stream error events.
 - `docs/dart-built-in-comparison.md`: selected behavior comparisons with
